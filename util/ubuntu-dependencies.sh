@@ -3,11 +3,10 @@
 # Abort on any error.
 set -e
 
-# This script installs Streisand builder dependencies on an Ubuntu
-# 16.04 system; Debian jessie has been lightly tested. It installs
-# system-wide packages. As a result, this is most useful on a fresh
-# machine, where conflicting Python packages won't be installed. If
-# you're not on a fresh regular machine, consider using
+# This script installs Streisand builder dependencies on an Ubuntu 18.04 or
+# 20.04 system; It installs system-wide packages. As a result, this is most 
+# useful on a fresh machine, where conflicting Python packages won't be 
+# installed. If you're not on a fresh regular machine, consider using  
 # venv-dependencies.sh instead.
 #
 # It's safe to run this script multiple times. For most cloud
