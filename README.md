@@ -16,6 +16,8 @@ Streisand
 
 **Silence censorship. Automate the [effect](https://en.wikipedia.org/wiki/Streisand_effect).**
 
+**Note: This branch is a direct for of the original [StreisandEffect](https://github.com/StreisandEffect/streisand) Project.  It has not been updated and is not currently supported.  Development work is occuring in the Ubuntu_2004_1804_update branch which will be merged into main when ready**
+
 The Internet can be a little unfair. It's way too easy for ISPs, telecoms, politicians, and corporations to block access to the sites and information that you care about. But breaking through these restrictions is *tough*. Or is it?
 
 If you have an account with a cloud computing provider, Streisand can set up a new node with many censorship-resistant VPN services nearly automatically. You'll need a little experience with a Unix command-line. (But without Streisand, it could take days for a skilled Unix administrator to configure these services securely!) At the end, you'll have a private website with software and instructions.
