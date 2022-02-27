@@ -1,0 +1,107 @@
+---
+# NOTE(@craun): Removed the "install python" steps for local dev setup. In order to even run this playbook ansible
+# already needs to be installed, which, implies that python is also installed.
+
+- hosts: localhost
+  gather_facts: yes
+  remote_user: root
+  become: yes
+  pre_tasks:
+    # NOTE(@alimakki): Due to key rotation, we pre-emptivley
+    # add the Google linux apt signing key required by some
+    # packages
+    - name: Add an Apt signing key, uses whichever key is at the URL
+      apt_key:
+        url: https://dl-ssl.google.com/linux/linux_signing_key.pub
+        state: present
+  tasks:
+    - name: Ensure consistent & clean apt state
+      apt:
+        update_cache: yes
+        autoclean: yes
+        autoremove: yes
+        purge: yes
+
+    - name: Remove old LXD/LXC from distro
+      apt:
+        name:
+          - lxd*
+          - lxc*
+        state: absent
+        autoremove: yes
+        purge: yes
+
+    - name: Install snapd
+      apt:
+        name: snapd
+
+    - name: Install LXD snap
+      snap:
+        name: lxd
+
+    - name: Connect LXD plug to slots
+      command: "{{ item }}"
+      with_items:
+        - "snap connect lxd:lxd-support"
+        - "snap connect lxd:network"
+
+    - name: Start lxd
+      command: "snap start lxd"
+
+    - name: Wait for the LXD socket
+      wait_for:
+        path: "/var/snap/lxd/common/lxd/unix.socket"
+        state: present
+        sleep: 5
+
+    - name: lxd init config
+      command: lxd init --auto --storage-backend dir
+      args:
+        creates: /var/snap/lxd/common/lxd/storage-pools/default
+
+    - name: lxd create network
+      command: lxc network create testbr0
+      args:
+        creates: /var/snap/lxd/common/lxd/networks/testbr0
+
+    - name: Retrieve the Ubuntu Xenial AMD64 LXC image fingerprint
+      uri:
+        url: https://images.linuxcontainers.org/1.0/images/aliases/ubuntu/xenial/amd64
+        return_content: yes
+      register: xenial_fingerprint
+
+    - name: Launch streisand container (this will take a while)
+      lxd_container:
+        name: streisand
+        state: started
+        url: "unix:/var/snap/lxd/common/lxd/unix.socket"
+        source:
+          type: image
+          mode: pull
+          server: https://images.linuxcontainers.org
+          protocol: lxd
+          # Use the retrieved alias to fetch the image
+          alias: "{{ xenial_fingerprint['json']['metadata']['target'] }}"
+        profiles: ["default"]
+        config:
+          security.privileged: "true"
+        wait_for_ipv4_addresses: true
+        timeout: 300
+
+    # TODO(@cpu): Why this is required is a mystery to me. Everything in
+    # development-setup.yml is able to access the unix socket without error.
+    # Without this gross chmod the LXD connection used to run the Streisand
+    # playbooks on the container fails with an access error. It would be nice to
+    # reduce these permissions. It's likely dangerous in a non-CI environment
+    - name: Open the permissions on the LXD socket
+      command: chmod 777 /var/snap/lxd/common/lxd/unix.socket
+
+    - name: Install python in container
+      delegate_to: streisand
+      raw: apt-get update && apt-get install -y python3 python3-apt python3-pip
+
+    - name: Set python3 as the default
+      raw: update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+
+    - name: Set python3-pip as the default
+      raw: update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1

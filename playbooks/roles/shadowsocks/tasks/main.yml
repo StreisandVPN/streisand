@@ -1,0 +1,113 @@
+---
+- name: Apply the sysctl value to enable TCP Fast Open
+  sysctl:
+    name: net.ipv4.tcp_fastopen
+    value: 3
+    state: present
+  when: ansible_virtualization_type != 'lxc'
+
+- name: Add the Shadowsocks PPA
+  apt_repository:
+    repo: 'ppa:max-c-lv/shadowsocks-libev'
+  register: shadowsocks_add_apt_repository
+  until: not shadowsocks_add_apt_repository.failed
+  retries: "{{ apt_repository_retries }}"
+  delay: "{{ apt_repository_delay }}"
+
+- name: Install shadowsocks-libev
+  apt:
+    package: "shadowsocks-libev"
+
+- name: Create the shadowsocks-libev config directory
+  file:
+    path: "{{ shadowsocks_location }}"
+    owner: root
+    # The nobody user in nogroup needs to be able to read the config file
+    group: nogroup
+    # It is safe to make this directory world read only because the password
+    # file and config file are not
+    mode: 0755
+    state: directory
+
+- name: Populate the shadowsocks-libev systemd defaults
+  template:
+    src: shadowsocks-libev.default.j2
+    dest: "/etc/default/shadowsocks-libev"
+    mode: 0644
+
+- name: Generate a random Shadowsocks password
+  shell: openssl rand -base64 48 > {{ shadowsocks_password_file }}
+  args:
+    creates: "{{ shadowsocks_password_file }}"
+
+- name: Set permissions on the Shadowsocks password file
+  file:
+    path: "{{ shadowsocks_password_file }}"
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Register Shadowsocks password
+  command: cat {{ shadowsocks_password_file }}
+  register: shadowsocks_password
+  changed_when: False
+
+# Add V2ray support
+- import_tasks: v2ray.yml
+  when: streisand_shadowsocks_v2ray_enabled|bool
+
+- name: Generate Shadowsocks config file
+  template:
+    src: config.json.j2
+    dest: "{{ shadowsocks_location }}/config.json"
+    # The nobody user in nogroup needs to be able to read the config file
+    group: nogroup
+    mode: 0640
+
+- name: Create the shadowsocks systemd configuration directory
+  file:
+    path: "{{ shadowsocks_systemd_service_path }}"
+    state: directory
+
+- name: Generate the nginx systemd service file
+  template:
+    src: shadowsocks-libev.service.j2
+    dest: "{{ shadowsocks_systemd_service_path }}/10-restart-failure.conf"
+    mode: 0644
+
+- name: Enable the Shadowsocks service so it starts at boot, and bring it up
+  systemd:
+    name: shadowsocks-libev.service
+    daemon_reload: yes
+    enabled: yes
+    state: restarted
+
+# For some providers (e.g. GCE/AWS) the streisand_ipv4_address != the
+# ansible_default_ipv4.address, and the Shadowsocks service is bound to the
+# latter instead of the former. We check both, tolerating errors checking the
+# former. This mess should probably be addressed in a more forward facing
+# manner.
+- block:
+    - name: "Check that the Shadowsocks service started ({{ streisand_ipv4_address }})"
+      wait_for:
+        host: "{{ streisand_ipv4_address }}"
+        port: "{{ shadowsocks_server_port }}"
+        state: started
+        timeout: 30
+      ignore_errors: yes
+  rescue:
+    - name: "Check that the Shadowsocks service started ({{ ansible_default_ipv4.address }})"
+      wait_for:
+        host: "{{ ansible_default_ipv4.address }}"
+        port: "{{ shadowsocks_server_port }}"
+        state: started
+        timeout: 30
+
+# Apply the Shadowsocks firewall rules
+- import_tasks: firewall.yml
+
+# Generate the Shadowsocks gateway docs & client QR code
+- import_tasks: docs.yml
+
+# Mirror the Shadowsocks clients
+- import_tasks: mirror.yml

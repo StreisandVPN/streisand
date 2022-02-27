@@ -1,0 +1,12 @@
+---
+apache_packages_to_remove:
+  - apache2
+  - apache2.2-bin
+  - apache2.2-common
+  - apache2-mpm-event
+  - apache2-mpm-itk
+  - apache2-mpm-prefork
+  - apache2-mpm-worker
+
+nginx_systemd_service_path: /etc/systemd/system/nginx.service.d
+nginx_default_html_path: /usr/share/nginx/html

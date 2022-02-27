@@ -1,0 +1,22 @@
+---
+ocserv_path: "/etc/ocserv"
+ocserv_ca: "{{ ocserv_path }}/ca"
+ocserv_config_file: "{{ ocserv_path }}/ocserv.conf"
+ocserv_firewall_rule: "iptables --wait {{ streisand_iptables_wait }} -t nat -A POSTROUTING -j MASQUERADE"
+
+ocserv_days_valid: "1825"
+ocserv_pid_file:    "/var/run/ocserv.pid"
+ocserv_socket_file: "/var/run/ocserv-socket"
+ocserv_ca_certificate_file: "{{ ocserv_path }}/ca.crt"
+ocserv_ca_key_file:         "{{ ocserv_path }}/ca.key"
+
+ocserv_server_certificate_file: "{{ ocserv_path }}/server.crt"
+ocserv_server_key_file:         "{{ ocserv_path }}/server.key"
+
+ocserv_hashed_password_file:    "{{ ocserv_path }}/ocpasswd"
+ocserv_password_file:           "{{ ocserv_path }}/ocserv-password"
+ocserv_server_common_name_file: "{{ ocserv_path }}/ocserv_server_common_name"
+
+ocserv_client_name: "streisand-openconnect-{{ streisand_ipv4_address }}"
+
+ocserv_gateway_location: "{{ streisand_gateway_location }}/openconnect"

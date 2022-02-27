@@ -1,0 +1,99 @@
+---
+# Use OpenSSL to generate self-signed certificates if we do not have Let's Encrypt.
+- import_tasks: openssl.yml
+  when: not le_ok
+
+# Include Let's Encrypt variables for template rendering
+- include_vars: ../../lets-encrypt/vars/main.yml
+
+- name: Generate a random Gateway password
+  shell: "{{ streisand_word_gen.gateway | trim }} > {{ streisand_gateway_password_file }}"
+  args:
+    creates: "{{ streisand_gateway_password_file }}"
+
+- name: Register the Gateway password
+  command: cat {{ streisand_gateway_password_file }}
+  register: streisand_gateway_password
+  changed_when: False
+
+- name: Install the required package for the htpasswd command
+  apt:
+    package: apache2-utils
+
+- name: Generate the htpasswd file
+  command: htpasswd -b -c {{ streisand_gateway_htpasswd_file }} {{ streisand_gateway_username }} {{ streisand_gateway_password.stdout }}
+  args:
+    creates: "{{ streisand_gateway_htpasswd_file }}"
+
+- name: Set permissions on the unhashed Gateway password file
+  file:
+    path: "{{ streisand_gateway_password_file }}"
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Copy the Streisand gateway password file locally
+  fetch:
+    src: "{{ streisand_gateway_password_file }}"
+    dest: "{{ streisand_gateway_password_localpath }}"
+    fail_on_missing: yes
+    flat: yes
+  when: streisand_client_test
+
+- name: Generate the virtual host and restart Nginx if it is updated
+  template:
+    src: vhost.j2
+    dest: /etc/nginx/sites-available/streisand
+    owner: root
+    group: root
+    mode: 0644
+  notify: Restart Nginx for the Gateway vhost
+
+- name: Enable the virtual host
+  file:
+    path: /etc/nginx/sites-enabled/streisand
+    src: /etc/nginx/sites-available/streisand
+    state: link
+
+  # TODO:
+  #   Add to CI testing https://github.com/StreisandEffect/streisand/issues/643
+- block:
+    - name: Keep a copy of our diagnostics on the server
+      copy:
+        src: ../../../../streisand-diagnostics.md
+        dest: "{{ streisand_gateway_location }}/streisand-diagnostics.md"
+
+    # generate the streisand server instructions and documentation
+    - include_tasks: docs.yml
+
+    # fetch and clean up
+    - include_tasks: fetch-and-cleanup.yml
+
+    - name: Ensure that all of the files in the Gateway have the proper permissions
+      file:
+        path: "{{ streisand_gateway_location }}"
+        owner: www-data
+        group: www-data
+        mode: 0750
+        state: directory
+        recurse: yes
+
+    - meta: flush_handlers
+
+    - block:
+        - name: Success!
+          pause:
+            prompt: "Server setup is complete. The `{{ streisand_server_name }}.html` instructions file in the generated-docs folder is ready to give to friends, family members, and fellow activists. Press Enter to continue."
+
+        - name: Attempt to open the instructions on Linux (if applicable). Errors in this task are ignored because the `xdg-open` command is not always available.
+          local_action: command xdg-open ../{{ streisand_local_directory }}/{{ streisand_server_name }}.html
+          ignore_errors: yes
+          when: hostvars['127.0.0.1']['ansible_system'] == "Linux"
+          become: no
+
+        - name: Open the instructions on macOS (if applicable)
+          local_action: command open ../{{ streisand_local_directory }}/{{ streisand_server_name }}.html
+          when: hostvars['127.0.0.1']['ansible_system'] == "Darwin"
+          become: no
+      when: not streisand_noninteractive
+  when: not streisand_ci

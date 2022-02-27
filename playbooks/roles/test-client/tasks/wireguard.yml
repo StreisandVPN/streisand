@@ -1,0 +1,35 @@
+---
+
+# Install the WireGuard PPA and packages
+- import_tasks: "../../wireguard/tasks/install.yml"
+
+# Import the Wireguard Streisand playbook vars
+- include_vars: "../../wireguard/vars/main.yml"
+
+- name: "Remove any stale Wireguard profiles"
+  file:
+    path: "{{ wireguard_profile_dir }}"
+    state: absent
+
+- name: "Create WireGuard profile directory"
+  file:
+    path: "{{ wireguard_profile_dir }}"
+    state: directory
+
+- name: "Download each of the WireGuard client profiles"
+  get_url:
+    url: "{{ gateway_test_url }}/wireguard/{{ profile_name }}.conf"
+    dest: "{{ wireguard_profile_dir }}/{{ profile_name }}.conf"
+    force_basic_auth: yes
+    url_username: "{{ gateway_test_user }}"
+    url_password: "{{ lookup('file', '{{ streisand_gateway_password_localpath }}') }}"
+    validate_certs: no
+  with_items: "{{ test_client_profiles.stdout_lines }}"
+  loop_control:
+    loop_var: "profile_name"
+
+- name: "Test each WireGuard client profile"
+  include: wireguard-profiletest.yml
+  with_items: "{{ test_client_profiles.stdout_lines }}"
+  loop_control:
+    loop_var: "profile_name"

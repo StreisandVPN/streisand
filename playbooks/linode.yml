@@ -1,0 +1,58 @@
+---
+- name: Provision the Linode Server
+# =================================
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+
+  vars:
+    regions:
+      "1": "ca-central"
+      "2": "us-central"
+      "3": "us-west"
+      "4": "us-southeast"
+      "5": "us-east"
+      "6": "eu-west"
+      "7": "ap-south"
+      "8": "eu-central"
+      "9": "ap-northeast"
+      "10": "ap-west"
+      "11": "ap-southeast"
+
+  vars_prompt:
+    - name: "linode_datacenter"
+      prompt: >
+        What region should the server be located in?
+          1. Toronto
+          2. Dallas
+          3. Fremont
+          4. Atlanta
+          5. Newark
+          6. London
+          7. Singapore
+          8. Frankfurt
+          9. Tokyo
+          10. Mumbai
+          11. Sydney
+        Please choose the number of your region. Press enter for default (#7) region.
+      default: "7"
+      private: no
+
+    - name: "linode_server_name"
+      prompt: "\nWhat should the server be named? Press enter for default (streisand).\n"
+      default: "streisand"
+      private: no
+
+    - name: "linode_api_token"
+      prompt: "\n\nThe following information can be found in the Linode Manager:\nhttps://cloud.linode.com/profile/tokens\n\nWhat is your Linode API Token?\n"
+      private: no
+
+    - name: "confirmation"
+      prompt: "\nStreisand will now set up your server. This process usually takes around ten minutes. Press Enter to begin setup...\n"
+
+  roles:
+    - genesis-linode
+
+- import_playbook: ssh-setup.yml
+- import_playbook: streisand.yml
+...

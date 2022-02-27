@@ -1,0 +1,10 @@
+---
+shadowsocks_server_port: "8530"
+shadowsocks_local_port: "1080"
+shadowsocks_timeout: "600"
+shadowsocks_encryption_method: "chacha20-ietf-poly1305"
+shadowsocks_tcp_fast_open: "true"
+shadowsocks_v2ray_plugin: "v2ray-plugin"
+shadowsocks_v2ray_cover_domain: "github.com"
+shadowsocks_v2ray_plugin_options: "host={{ shadowsocks_v2ray_cover_domain }}"
+shadowsocks_v2ray_plugin_protocol: "http"

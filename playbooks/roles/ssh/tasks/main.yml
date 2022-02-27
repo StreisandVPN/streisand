@@ -1,0 +1,26 @@
+---
+- name: Reconfigure OpenSSH with enhanced security settings
+  copy:
+    src: sshd_config
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: 0644
+  notify: Restart SSH
+
+- name: Generate a stronger RSA host key
+  shell: "rm {{ ssh_rsa_host_private_key }} {{ ssh_rsa_host_public_key }} && ssh-keygen -h -t rsa -b {{ ssh_rsa_host_key_size }} -f {{ ssh_rsa_host_private_key }} -N '' && touch {{ ssh_rsa_host_key_change_verification }}"
+  args:
+    creates: "{{ ssh_rsa_host_key_change_verification }}"
+    warn: no
+  notify: Restart SSH
+
+- name: Ensure missing host keys are generated
+  command: ssh-keygen -A
+
+- name: Register the server's SSH fingerprints
+  command: ssh-keygen -lf /etc/ssh/{{ item }}
+  register: ssh_server_fingerprints
+  with_items:
+    - ssh_host_ecdsa_key.pub
+    - ssh_host_rsa_key.pub

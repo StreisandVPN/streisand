@@ -1,0 +1,5 @@
+[streisand]
+streisand ansible_connection=lxd ansible_become=yes
+
+[localhost]
+localhost ansible_connection=local

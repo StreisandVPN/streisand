@@ -1,0 +1,87 @@
+---
+# Path to the gateway password on the Ansible host
+streisand_gateway_password_localpath: "../{{ streisand_local_directory }}/gateway-password.txt"
+
+# Path to the gateway password file on the Streisand client
+gateway_password_file: "/root/gateway-password.txt"
+# URL for accessing the Streisand server's HTTP gateway page
+gateway_test_url: "https://{{ streisand_ip }}"
+# User for accessing the Streisand server HTTP gateway page
+gateway_test_user: "streisand"
+
+# The directory to copy test scripts to
+test_script_dir: "/usr/local/bin/"
+
+# An external URL used to test connectivity through Shadowsocks/WireGuard/etc
+external_test_url: "https://github.com"
+
+# The gateway URL for clients to download the forward user's RSA key
+gateway_ssh_key: "{{ gateway_test_url }}/ssh/streisand_rsa"
+# The gateway URL for clients to download the SSH known hosts file
+gateway_ssh_hosts: "{{ gateway_test_url }}/ssh/streisand.known_hosts"
+
+# Files created on the Streisand client test for SSH config:
+forward_ssh_key: "/root/.ssh/streisand_rsa"
+forward_ssh_config: "/root/.ssh/config"
+forward_ssh_hosts: "/root/.ssh/streisand.known_hosts"
+
+# Forwarding SSH username
+forward_ssh_user: "forward"
+
+# Port on the Streisand client to use for the SOCKS SSH proxy
+forward_socks_port: 9876
+
+# Port on the Streisand server for TinyProxy
+tinyproxy_remote_port: 8888
+
+# Port on the Streisand client for the TinyProxy port forward
+tinyproxy_local_port: 8888
+
+# PID file for open SSH port forward connections
+ssh_pid_file: "/tmp/ssh.pid"
+
+# The gateway URL for clients to download the Shadowsocks QR code image
+gateway_shadowsocks_qr: "{{ gateway_test_url }}/shadowsocks/shadowsocks-qr-code.png"
+
+# Path to the Shadowsocks QR code image on the client machine
+shadowsocks_qr_file: "/root/shadowsocks-qr-code.png"
+
+# The gateway URL for clients to download the Shadowsocks2 Linux source
+gateway_shadowsocks_client: "{{ gateway_test_url }}/mirror/shadowsocks/shadowsocks2-linux-x64.gz"
+
+# Path to the Shadowsocks2 client source on the Streisand client
+shadowsocks_client: "/root/shadowsocks2-linux-x64"
+shadowsocks_client_zip: "{{ shadowsocks_client }}.gz"
+
+# The gateway URL for clients to download the WireGuard config file
+gateway_wireguard_config: "{{ gateway_test_url }}/wireguard/wg0.conf"
+
+wireguard_profile_dir: "/root/wireguard-profiles"
+
+gateway_profile_inventory: "{{ gateway_test_url }}/test-client-inventory"
+test_client_profiles_file: "/tmp/test-client-inventory"
+
+openvpn_profile_dir: "/etc/openvpn"
+openvpn_profile_addons: "/tmp/openvpn-profile-addons"
+openvpn_pid_file: "/tmp/openvpn.pid"
+
+gateway_openconnect_ca_file: "{{ gateway_test_url }}/openconnect/ca.crt"
+gateway_openconnect_password_file: "{{ gateway_test_url }}/openconnect/password.txt"
+
+openconnect_ca_file: "/root/openconnect.ca.crt"
+openconnect_pid_file: "/tmp/openconnect.pid"
+openconnect_profile_dir: "/root/openconnect-profiles"
+openconnect_password_file: "{{ openconnect_profile_dir }}/openconnect.password.txt"
+
+gateway_tor_qr: "{{ gateway_test_url }}/tor/tor-obfs4-qr-code.png"
+gateway_tor_hidden_service_hostname: "{{ gateway_test_url }}/tor/hidden-service-hostname.txt"
+tor_pid_file: "/tmp/tor.pid"
+tor_socks_port: 9050
+tor_obfs4_qr: "/root/tor-obs4-qr-code.png"
+tor_config: "/etc/tor/streisand.obfs4.relay"
+tor_hidden_service_hostname: "/tmp/hidden-service-hostname.txt"
+
+gateway_stunnel_conf: "{{ gateway_test_url }}/openvpn/stunnel.conf"
+stunnel_dir: "/root/stunnel/"
+stunnel_conf: "{{ stunnel_dir }}/stunnel.conf"
+stunnel_pid_file: "/tmp/stunnel.pid"

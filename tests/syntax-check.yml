@@ -1,0 +1,93 @@
+---
+
+# Include each playbook in order to check syntax of each playbook
+- name: Include amazon.yml
+  import_playbook: ../playbooks/amazon.yml
+
+- name: Include azure.yml
+  import_playbook: ../playbooks/azure.yml
+
+- name: Include cloud-status.yml
+  import_playbook: ../playbooks/cloud-status.yml
+
+- name: Include digitalocean.yml
+  import_playbook: ../playbooks/digitalocean.yml
+
+- name: Include existing-server.yml
+  import_playbook: ../playbooks/existing-server.yml
+
+- name: Include google.yml
+  import_playbook: ../playbooks/google.yml
+
+- name: Include lets-encrypt.yml
+  import_playbook: ../playbooks/lets-encrypt.yml
+
+- name: Include linode.yml
+  import_playbook: ../playbooks/linode.yml
+
+- name: Include localhost.yml
+  import_playbook: ../playbooks/localhost.yml
+
+- name: Include provider-detect.yml
+  import_playbook: ../playbooks/provider-detect.yml
+
+- name: Include python.yml
+  import_playbook: ../playbooks/python.yml
+
+- name: Include rackspace.yml
+  import_playbook: ../playbooks/rackspace.yml
+
+- name: Include ssh-setup.yml
+  import_playbook: ../playbooks/ssh-setup.yml
+
+- name: Include streisand.yml
+  import_playbook: ../playbooks/streisand.yml
+
+- name: Include test-client.yml
+  import_playbook: ../playbooks/test-client.yml
+
+- name: Include vagrant.yml
+  import_playbook: ../playbooks/vagrant.yml
+
+- name: Include run.yml
+  import_playbook: run.yml
+
+# Explicity include each role to ensure all roles are tested
+- hosts: localhost
+  remote_user: root
+  roles:
+    - azure-security-group
+    - certificates
+    - common
+    - diagnostics
+    - dnsmasq
+    - download-and-verify
+    - ec2-security-group
+    - gce-network
+    - genesis-amazon
+    - genesis-azure
+    - genesis-digitalocean
+    - genesis-google
+    - genesis-linode
+    - genesis-rackspace
+    - i18n-docs
+    - ip-forwarding
+    - lets-encrypt
+    - nginx
+    - openconnect
+    - openvpn
+    - service-net
+    - shadowsocks
+    - ssh
+    - ssh-forward
+    - sslh
+    - streisand-gateway
+    - streisand-mirror
+    - stunnel
+    - sysctl
+    - test-client
+    - tinyproxy
+    - tor-bridge
+    - ufw
+    - validation
+    - wireguard
