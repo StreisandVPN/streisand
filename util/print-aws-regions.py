@@ -8,6 +8,7 @@ names = (
     ("us-east-2",      "US East",      "Ohio"),
     ("us-west-1",      "US West",      "N. California"),
     ("us-west-2",      "US West",      "Oregon"),
+    ("af-south-1"),    "Africa",       "Cape Town"),
     ("ca-central-1",   "Canada",       "Central"),
     ("eu-central-1",   "EU",           "Frankfurt"),
     ("eu-west-1",      "EU",           "Ireland"),
@@ -18,10 +19,13 @@ names = (
     ("ap-northeast-3", "Asia Pacific", "Osaka-Local"),
     ("ap-southeast-1", "Asia Pacific", "Singapore"),
     ("ap-southeast-2", "Asia Pacific", "Sydney"),
+    ("ap-southeast-3", "Asia Pacific", "Jakarta"),
     ("ap-south-1",     "Asia Pacific", "Mumbai"),
     ("ap-east-1",      "Asia Pacific", "Hong Kong"),
     ("eu-north-1",     "EU",           "Stockholm"),
     ("sa-east-1",      "South America", "São Paulo"),
+    ("eu-west-1",      "Asia Pacific", "Milan"),
+    ("me-south-1",     "Middle East", "Bahrain"),
 )
 
 sorted_names = sorted(names)
