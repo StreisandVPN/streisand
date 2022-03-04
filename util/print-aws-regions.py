@@ -24,27 +24,27 @@ names = (
     ("ap-east-1",      "Asia Pacific", "Hong Kong"),
     ("eu-north-1",     "EU",           "Stockholm"),
     ("sa-east-1",      "South America", "São Paulo"),
-    ("eu-west-1",      "Asia Pacific", "Milan"),
+    ("eu-south-1",      "Asia Pacific", "Milan"),
     ("me-south-1",     "Middle East", "Bahrain"),
 )
 
-sorted_names = sorted(names)
+sorted_names=sorted(names)
 
 print("")
-print ("""
+print("""
     regions:""")
 for i in range(len(sorted_names)):
-    j = i + 1
-    o = sorted_names[i]
+    j=i + 1
+    o=sorted_names[i]
     print('      "{j}": "{symname}"'.format(j=j, symname=o[0]))
 
-print ("----------------------")
+print("----------------------")
 
-print ("")
-print ("""
+print("")
+print("""
         In what region should the server be located?""")
 for i in range(len(sorted_names)):
-    j = i + 1
-    o = sorted_names[i]
+    j=i + 1
+    o=sorted_names[i]
     print("          {j:>2}. {symname:<15} {region:<14} ({nickname})".format(
         j=j, symname=o[0], region=o[1], nickname=o[2]))
