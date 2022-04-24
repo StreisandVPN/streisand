@@ -1,11 +1,13 @@
 ---
-nginx_key_country:  "US"
+nginx_key_country: "US"
 nginx_key_province: "California"
 nginx_key_city: "Malibu"
 nginx_key_org: "Streisand"
 nginx_key_ou: "Streisand Effect Department"
 
-nginx_port: "443"
+web_port: "443"
 
 streisand_gateway_username: "streisand"
 streisand_gateway_rsa_key_size: "3072"
+openvpn_port: "636"
+openvpn_port_udp: "8757"

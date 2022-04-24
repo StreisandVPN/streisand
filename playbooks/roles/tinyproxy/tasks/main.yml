@@ -1,19 +1,40 @@
 ---
+- name: "Ensure that '{{ tinyproxy_group }}' user group is created"
+  ansible.builtin.group:
+    name: "{{ tinyproxy_group }}"
+    state: present
+
+- name: "Ensure that '{{ tinyproxy_user }}' user is created"
+  ansible.builtin.user:
+    name: "{{ tinyproxy_user }}"
+    create_home: false
+    home: /nonexistent
+    shell: /usr/sbin/nologin
+    groups: "{{ tinyproxy_group }}"
+
 - name: Install Tinyproxy
   apt:
     package: tinyproxy
+  register: task_result
+  until: task_result is succeeded
+  retries: 30
+  delay: 10
 
 - name: Stop (init.d's) tinyproxy
   systemd:
     name: tinyproxy.service
     state: stopped
 
+- name: Get path to tinyproxy binary
+  shell: which tinyproxy
+  register: tinyproxy_path
+
 - name: Create the tinyproxy config directory
   file:
     path: "{{ tinyproxy_conf_dir }}"
     state: directory
-    owner: nobody
-    group: nogroup
+    owner: root
+    group: root
     mode: 0755
 
 - name: Generate the tinyproxy configuration file
@@ -45,9 +66,27 @@
     path: /etc/tinyproxy.conf
     state: absent
 
+- name: Ensure tinyproxy log directory exists
+  ansible.builtin.file:
+    path: "{{ tinyproxy_log_dir }}"
+    state: directory
+    owner: "{{ tinyproxy_user }}"
+    group: "{{ tinyproxy_group }}"
+    mode: 0744
+    recurse: true
+
+- name: Ensure tinyproxy pid directory exists
+  ansible.builtin.file:
+    path: "{{ tinyproxy_pid_dir }}"
+    state: directory
+    owner: "{{ tinyproxy_user }}"
+    group: "{{ tinyproxy_group }}"
+    mode: 0744
+    recurse: true
+
 - name: Enable and restart the tinyproxy service
   systemd:
-    daemon_reload: yes
+    daemon_reload: true
     name: tinyproxy.service
-    enabled: yes
+    enabled: true
     state: restarted

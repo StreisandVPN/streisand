@@ -14,4 +14,4 @@
 - name: "Enable the streisand-ipforward init service"
   service:
     name: streisand-ipforward
-    enabled: yes
+    enabled: true

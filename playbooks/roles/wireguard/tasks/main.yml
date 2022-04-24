@@ -1,5 +1,4 @@
 ---
-
 # Set up the PPA and install packages
 - import_tasks: install.yml
 
@@ -11,7 +10,7 @@
 - name: Register the server key file contents
   command: cat {{ item }}
   register: wireguard_server_key_files
-  changed_when: False
+  changed_when: false
   with_items:
     - "{{ wireguard_server_private_key_file }}"
     - "{{ wireguard_server_public_key_file }}"
@@ -19,7 +18,7 @@
 - name: Set the server key material facts
   set_fact:
     wireguard_server_private_key: "{{ wireguard_server_key_files.results[0].stdout }}"
-    wireguard_server_public_key:  "{{ wireguard_server_key_files.results[1].stdout }}"
+    wireguard_server_public_key: "{{ wireguard_server_key_files.results[1].stdout }}"
 
 - name: Create client directory
   file:
@@ -60,7 +59,7 @@
     loop_var: "client_name"
     label: "{{ client_name.item }}"
   register: wireguard_client_pubkeys
-  changed_when: False
+  changed_when: false
 
 - name: Register client private keys
   command: cat client.key
@@ -71,7 +70,7 @@
     loop_var: "client_name"
     label: "{{ client_name.item }}"
   register: wireguard_client_privkeys
-  changed_when: False
+  changed_when: false
 
 - name: Generate the client configuration profiles
   template:
@@ -101,7 +100,7 @@
     group: root
     mode: 0600
 
-- name: Enable reload-module-on-update to upgrade WireGuard without user confirmation
+- name: Enable reload-module-on-update to upgrade WireGuard
   file:
     path: "{{ wireguard_path }}/.reload-module-on-update"
     state: touch
@@ -109,15 +108,15 @@
 # Set up the WireGuard firewall rules
 - import_tasks: firewall.yml
 
-- name: Enable the WireGuard service so it starts at boot, and bring up the WireGuard network interface
+- name: Enable the WireGuard service so it starts at boot
   systemd:
     name: wg-quick@wg0.service
-    enabled: yes
+    enabled: true
     state: started
   # Temporary workaround for issue #500
-  ignore_errors: yes
+  ignore_errors: true
 
-- name: "Configure DNSMasq to listen on {{ dnsmasq_wireguard_ip }}:53"
+- name: "Configure DNSMasq to listen on {{ wireguard_ip }}:53"
   template:
     src: wireguard_dnsmasq.conf.j2
     dest: /etc/dnsmasq.d/wireguard.conf

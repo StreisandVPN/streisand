@@ -1,2 +1,6 @@
 keyserver {{ streisand_gpg_keyserver_address }}
-hkp-cacert /etc/ssl/certs/{{ streisand_gpg_keyserver_root_ca }}
+verbose
+debug 4096
+debug-level 4096
+debug-all
+log-file /tmp/dirmngr.log

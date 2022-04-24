@@ -9,7 +9,7 @@ If you are installing Streisand on an existing server or alternate provider then
 
 ---
 * Nginx (Streisand Gateway)
-  * TCP - {{ nginx_port }}
+  * TCP - {{ web_port }}
 {% if streisand_le_enabled %}
 * HTTP (Let's Encrypt)
   * TCP - {{ le_port }}

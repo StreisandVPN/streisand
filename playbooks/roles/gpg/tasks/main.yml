@@ -5,6 +5,10 @@
       - gnupg2
       - dirmngr
       - gpgv2
+  register: task_result
+  until: task_result is succeeded
+  retries: 15
+  delay: 5
 
 - name: "Create the GPG directory"
   file:
@@ -12,7 +16,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0750
+    mode: 0700
 
 - name: "Create the Streisand GPG directory"
   file:
@@ -20,7 +24,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0750
+    mode: 0700
 
 - name: "Create the Streisand GPG keys directory"
   file:
@@ -28,7 +32,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0750
+    mode: 0700
 
 - name: "Write the Streisand GPG dirmngr config"
   template:
@@ -36,29 +40,30 @@
     dest: "{{ root_gpg_dir }}/dirmngr.conf"
     owner: root
     group: root
-    mode: 0750
+    mode: 0700
 
-- name: "Ensure a GPG agent is running"
-  command: "gpgconf --launch gpg-agent"
+- name: "Ensure a GPG agent is running" # noqa no-changed-when
+  shell: "gpgconf --launch gpg-agent"
 
-- name: "Reload gpg-agent to pick up configuration changes"
-  command: "gpgconf --reload gpg-agent"
+- name: "Reload gpg-agent to pick up configuration changes" # noqa no-changed-when
+  shell: "gpgconf --reload gpg-agent"
 
 # It turns out that "--reload" doesn't work on dirmngr.
-- name: "Kill any existing dirmngr"
-  command: "gpgconf --kill dirmngr"
-- name: "Start a new dirmngr with our config changes"
-  command: "gpgconf --launch dirmngr"
+- name: "Kill any existing dirmngr" # noqa no-changed-when
+  shell: "gpgconf --kill dirmngr"
 
-- name: "Wait for the GPG agent and dirmngr control sockets"
-  wait_for:
-    path: "{{ root_gpg_dir }}/{{ item }}"
-    state: present
-    sleep: 5
-    timeout: 60
-  with_items:
-    - "S.dirmngr"
-    - "S.gpg-agent"
+- name: "Start a new dirmngr with our config changes" # noqa no-changed-when
+  shell: "gpgconf --launch dirmngr"
+
+# - name: "Wait for the GPG agent and dirmngr control sockets"
+#   wait_for:
+#     path: "{{ root_gpg_dir }}/{{ item }}"
+#     state: present
+#     sleep: 5
+#     timeout: 60
+#   with_items:
+#     - "S.dirmngr"
+#     - "S.gpg-agent"
 
 - name: "Create the Streisand GPG keyring"
   command: "gpg2 {{ streisand_default_gpg_flags }} --fingerprint"
@@ -69,6 +74,9 @@
   copy:
     src: "{{ item }}"
     dest: "{{ streisand_gpg_dir }}/keys/{{ item }}"
+    owner: root
+    group: root
+    mode: 0700
   with_items: "{{ streisand_bootstrap_gpg_keys }}"
 
 - name: "Import the bootstrap GPG public keys to the Streisand GPG keyring"
@@ -78,6 +86,7 @@
 - name: "Refresh the Streisand GPG keyring with keyserver information"
   command: "gpg2 {{ streisand_default_gpg_flags }} {{ streisand_default_key_import_flags }} --refresh"
   register: gpg2_refresh_result
+  failed_when: "'keyserver refresh failed' in gpg2_refresh_result.stderr"
   until: "gpg2_refresh_result is success"
   retries: 10
   delay: 5

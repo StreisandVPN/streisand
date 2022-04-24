@@ -3,7 +3,7 @@
   # ==============================
   hosts: localhost
   connection: local
-  gather_facts: yes
+  gather_facts: true
 
   vars:
     # The region dict is generated from ./util/print-aws-regions.py

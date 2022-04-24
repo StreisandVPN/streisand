@@ -2,7 +2,7 @@
 - name: Find the files to fetch from the Streisand temporary gateway directory
   find:
     paths: "{{ streisand_temp_gateway_path }}"
-    recurse: no
+    recurse: false
     pattern: "*.html"
   register: gateway_local_files
 
@@ -10,7 +10,7 @@
   fetch:
     dest: ../{{ streisand_local_directory }}/
     src: "{{ file.path }}"
-    flat: yes
+    flat: true
   with_items: "{{ gateway_local_files.files }}"
   loop_control:
     loop_var: file

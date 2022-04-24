@@ -1,21 +1,21 @@
 ---
 - name: Provision the GCE Server
-# =======================================
+  # =======================================
   hosts: localhost
   connection: local
-  gather_facts: yes
+  gather_facts: true
 
   vars:
     zones:
-      "1":  "us-central1-a"
-      "2":  "us-central1-b"
-      "3":  "us-central1-c"
-      "4":  "us-central1-f"
-      "5":  "us-east4-a"
-      "6":  "us-east4-b"
-      "7":  "us-east4-c"
-      "8":  "us-east1-b"
-      "9":  "us-east1-c"
+      "1": "us-central1-a"
+      "2": "us-central1-b"
+      "3": "us-central1-c"
+      "4": "us-central1-f"
+      "5": "us-east4-a"
+      "6": "us-east4-b"
+      "7": "us-east4-c"
+      "8": "us-east1-b"
+      "9": "us-east1-c"
       "10": "us-east1-d"
       "11": "us-west1-a"
       "12": "us-west1-b"
@@ -142,7 +142,7 @@
     - name: Register JSON file contents
       command: cat {{ gce_json_file_location }}
       register: gce_json_file_contents
-      changed_when: False
+      changed_when: false
 
     - name: Set JSON file contents fact
       set_fact:
@@ -162,4 +162,3 @@
 - import_playbook: ssh-setup.yml
 - import_playbook: cloud-status.yml
 - import_playbook: streisand.yml
-...

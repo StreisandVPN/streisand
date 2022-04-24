@@ -25,4 +25,4 @@
 - name: "Enable the streisand-wireguard init service"
   service:
     name: streisand-wireguard
-    enabled: yes
+    enabled: true

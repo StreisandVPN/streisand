@@ -11,7 +11,7 @@
 - name: Set the proper permissions on all the private keys
   file:
     path: "{{ ca_path }}"
-    recurse: yes
+    recurse: true
     state: directory
     owner: root
     group: root
@@ -37,22 +37,37 @@
 - name: Register the TLS server common name
   command: cat "{{ tls_server_common_name_file }}"
   register: tls_server_common_name
-  changed_when: False
+  changed_when: false
 
-- name: Generate the OpenSSL configuration that will be used for the server certificate's req and ca commands
+- name: >
+    Generate the OpenSSL configuration that will be used for the server
+    certificate's req and ca commands
   template:
     src: openssl.cnf.j2
     dest: "{{ ca_path }}/openssl.cnf"
+    owner: root
+    group: root
+    mode: 0744
 
-- name: Seed a blank database file that will be used when generating the Server's certificate
+- name: >
+    Seed a blank database file that will be used when generating the Server's
+    certificate
   file:
     path: "{{ ca_path }}/index.txt"
     state: touch
+    owner: root
+    group: root
+    mode: 0744
 
-- name: Seed a serial file that will be used when generating the Server's certificate
+- name: >
+    Seed a serial file that will be used when generating the Server's
+    certificate
   copy:
     content: "01"
     dest: "{{ ca_path }}/serial"
+    owner: root
+    group: root
+    mode: 0744
 
 - name: Generate CSR for the Server
   command: openssl req -batch -extensions server -new -key server.key -out server.csr -config {{ ca_path }}/openssl.cnf

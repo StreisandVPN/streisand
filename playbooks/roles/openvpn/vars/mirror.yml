@@ -1,30 +1,35 @@
 ---
 # OpenVPN Download variables
 # --------------------------
-openvpn_mirror_location:  "{{ streisand_mirror_location }}/openvpn"
+openvpn_mirror_location: "{{ streisand_mirror_location }}/openvpn"
 openvpn_mirror_href_base: "/mirror/openvpn"
 
 openvpn_base_download_url: "https://build.openvpn.net/downloads/releases/latest"
 
-openvpn_source_filename:      "openvpn-latest-stable.tar.gz"
-openvpn_source_sig_filename:  "{{ openvpn_source_filename }}.asc"
-openvpn_source_href:          "{{ openvpn_mirror_href_base }}/{{ openvpn_source_filename }}"
-openvpn_source_sig_href:      "{{ openvpn_mirror_href_base }}/{{ openvpn_source_sig_filename }}"
+openvpn_source_filename: "openvpn-latest-stable.tar.gz"
+openvpn_source_sig_filename: "{{ openvpn_source_filename }}.asc"
+openvpn_source_href: "{{ openvpn_mirror_href_base }}/{{ openvpn_source_filename }}"
+openvpn_source_sig_href: "{{ openvpn_mirror_href_base }}/{{ openvpn_source_sig_filename }}"
 
-openvpn_windows_installer_filename:     "openvpn-install-latest-stable-win10.exe"
-openvpn_windows_installer_sig_filename: "{{ openvpn_windows_installer_filename }}.asc"
-openvpn_windows_installer_href:         "{{ openvpn_mirror_href_base }}/{{ openvpn_windows_installer_filename }}"
-openvpn_windows_installer_sig_href:     "{{ openvpn_mirror_href_base }}/{{ openvpn_windows_installer_sig_filename }}"
+openvpn_win_installer_filename: "openvpn-install-latest-stable-win10.exe"
+openvpn_win_installer_sig_filename: "{{ openvpn_win_installer_filename }}.asc"
+openvpn_win_installer_href: "{{ openvpn_mirror_href_base }}/{{ openvpn_win_installer_filename }}"
+openvpn_win_installer_sig_href: "{{ openvpn_mirror_href_base }}/{{ openvpn_win_installer_sig_filename }}"
 
-openvpn_gpg_keyid: "5ACFEAC6"
 openvpn_download_files:
-  - { "file": "{{ openvpn_source_filename }}", "sig": "{{ openvpn_source_sig_filename }}" }
-  - { "file": "{{ openvpn_windows_installer_filename }}", "sig": "{{ openvpn_windows_installer_sig_filename }}" }
+  - {
+      "file": "{{ openvpn_source_filename }}",
+      "sig": "{{ openvpn_source_sig_filename }}",
+    }
+  - {
+      "file": "{{ openvpn_win_installer_filename }}",
+      "sig": "{{ openvpn_win_installer_sig_filename }}",
+    }
 
 # macOS
-tunnelblick_version:  "3.8.1"
-tunnelblick_build:    "5400"
+tunnelblick_version: "3.8.7a"
+tunnelblick_build: "5770"
 tunnelblick_filename: "Tunnelblick_{{ tunnelblick_version }}_build_{{ tunnelblick_build }}.dmg"
-tunnelblick_href:     "{{ openvpn_mirror_href_base }}/{{ tunnelblick_filename }}"
-tunnelblick_url:      "https://tunnelblick.net/release/{{ tunnelblick_filename }}"
-tunnelblick_checksum: "sha256:a619a1c01a33a8618fc2489a43241e95c828dcdb7f7c56cfc883dcbb22644693"
+tunnelblick_href: "{{ openvpn_mirror_href_base }}/{{ tunnelblick_filename }}"
+tunnelblick_url: "https://tunnelblick.net/release/{{ tunnelblick_filename }}"
+tunnelblick_checksum: "sha256:bb5858619a58561d07d23df470b9548b82c1544cea9ffade30c4362dc8f3bd93"

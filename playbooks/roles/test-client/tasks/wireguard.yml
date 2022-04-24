@@ -1,5 +1,4 @@
 ---
-
 # Install the WireGuard PPA and packages
 - import_tasks: "../../wireguard/tasks/install.yml"
 
@@ -20,10 +19,10 @@
   get_url:
     url: "{{ gateway_test_url }}/wireguard/{{ profile_name }}.conf"
     dest: "{{ wireguard_profile_dir }}/{{ profile_name }}.conf"
-    force_basic_auth: yes
+    force_basic_auth: true
     url_username: "{{ gateway_test_user }}"
-    url_password: "{{ lookup('file', '{{ streisand_gateway_password_localpath }}') }}"
-    validate_certs: no
+    url_password: "{{ lookup('file', '{{ streisand_gw_password_path }}') }}"
+    validate_certs: false
   with_items: "{{ test_client_profiles.stdout_lines }}"
   loop_control:
     loop_var: "profile_name"

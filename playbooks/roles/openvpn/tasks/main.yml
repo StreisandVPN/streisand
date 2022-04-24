@@ -2,7 +2,9 @@
 # Add the apt key and install OpenVPN
 - import_tasks: install.yml
 
-- name: "Configure DNSMasq to listen on {{ dnsmasq_openvpn_tcp_ip }}:53 and {{ dnsmasq_openvpn_udp_ip }}:53"
+- name: >
+    "Configure DNSMasq to listen on {{ dnsmasq_openvpn_tcp_ip }}:53 and
+    {{ dnsmasq_openvpn_udp_ip }}:53"
   template:
     src: openvpn_dnsmasq.conf.j2
     dest: /etc/dnsmasq.d/openvpn.conf
@@ -11,20 +13,20 @@
 - include_role:
     name: certificates
   vars:
-    ca_path:            "{{ openvpn_path }}"
-    tls_ca:             "{{ openvpn_ca }}"
-    tls_client_path:    "{{ openvpn_path }}"
-    generate_ca_server: yes
-    generate_client:    yes
-    tls_request_subject:         "{{ openvpn_request_subject }}"
-    tls_server_common_name_file: "{{ openvpn_server_common_name_file }}"
+    ca_path: "{{ openvpn_path }}"
+    tls_ca: "{{ openvpn_ca }}"
+    tls_client_path: "{{ openvpn_path }}"
+    generate_ca_server: true
+    generate_client: true
+    tls_request_subject: "{{ openvpn_request_subject }}"
+    tls_server_common_name_file: "{{ openvpn_server_name_file }}"
     tls_sans:
       - "{{ streisand_ipv4_address }}"
 
 - name: Register the OpenVPN server common name
-  command: cat "{{ openvpn_server_common_name_file }}"
+  command: cat "{{ openvpn_server_name_file }}"
   register: openvpn_server_common_name
-  changed_when: False
+  changed_when: false
 
 - name: Generate HMAC firewall key
   command: openvpn --genkey --secret {{ openvpn_hmac_firewall }}
@@ -36,7 +38,7 @@
   args:
     chdir: "{{ openvpn_path }}"
   register: openvpn_ca_contents
-  changed_when: False
+  changed_when: false
 
 - name: Register client certificate contents
   command: cat client.crt
@@ -47,7 +49,7 @@
     loop_var: "client_name"
     label: "{{ client_name.item }}"
   register: openvpn_client_certificates
-  changed_when: False
+  changed_when: false
 
 - name: Register client key contents
   command: cat client.key
@@ -58,16 +60,18 @@
     loop_var: "client_name"
     label: "{{ client_name.item }}"
   register: openvpn_client_keys
-  changed_when: False
+  changed_when: false
 
 - name: Register HMAC firewall contents
   command: cat ta.key
   args:
     chdir: "{{ openvpn_path }}"
   register: openvpn_hmac_firewall_contents
-  changed_when: False
+  changed_when: false
 
-- name: Create the client configuration profiles that will be used when connecting directly
+- name: >
+    Create the client configuration profiles that will be used when
+    connecting directly
   template:
     src: client-direct.ovpn.j2
     dest: "{{ openvpn_path }}/{{ item[0].stdout }}/{{ openvpn_direct_profile_filename }}"
@@ -78,7 +82,9 @@
   loop_control:
     label: "{{ item[0].item }}"
 
-- name: Create the client configuration profiles that will be used when connecting directly via UDP
+- name: >
+    Create the client configuration profiles that will be used when connecting
+    directly via UDP
   template:
     src: client-direct-udp.ovpn.j2
     dest: "{{ openvpn_path }}/{{ item[0].stdout }}/{{ openvpn_direct_udp_profile_filename }}"
@@ -89,7 +95,9 @@
   loop_control:
     label: "{{ item[0].item }}"
 
-- name: Create the client configuration profiles that will be used when connecting via sslh
+- name: >
+    Create the client configuration profiles that will be used when connecting
+    via sslh
   template:
     src: client-sslh.ovpn.j2
     dest: "{{ openvpn_path }}/{{ item[0].stdout }}/{{ openvpn_sslh_profile_filename }}"
@@ -100,7 +108,9 @@
   loop_control:
     label: "{{ item[0].item }}"
 
-- name: Create the client configuration profiles that will be used when connecting via stunnel
+- name: >
+    Create the client configuration profiles that will be used when connecting
+    via stunnel
   template:
     src: client-stunnel.ovpn.j2
     dest: "{{ openvpn_path }}/{{ item[0].stdout }}/{{ openvpn_stunnel_profile_filename }}"
@@ -112,7 +122,9 @@
     label: "{{ item[0].item }}"
   when: streisand_stunnel_enabled
 
-- name: Create the combined client configuration profiles that will be used to connect from the fastest to the most compatible
+- name: >
+    Create the combined client configuration profiles that will be used to
+    connect from the fastest to the most compatible
   template:
     src: client-combined.ovpn.j2
     dest: "{{ openvpn_path }}/{{ item[0].stdout }}/{{ openvpn_combined_profile_filename }}"
@@ -137,7 +149,7 @@
   systemd:
     name: openvpn.service
     state: stopped
-    enabled: no
+    enabled: false
 
 - name: Copy the OpenVPN system unit files
   template:
@@ -149,14 +161,16 @@
 
 - name: Enable the OpenVPN services
   systemd:
-    daemon_reload: yes
+    daemon_reload: true
     name: "{{ item }}"
-    enabled: yes
+    enabled: true
     state: restarted
   with_items:
     - "{{ openvpn_service_names }}"
 
-- name: Copy the ca.crt and ta.key files that clients will need in order to connect to the OpenVPN server
+- name: >
+    Copy the ca.crt and ta.key files that clients will need in order to
+    connect to the OpenVPN server
   command: cp {{ openvpn_path }}/{{ item[1] }} {{ openvpn_path }}/{{ item[0].stdout }}
   with_nested:
     - "{{ vpn_client_names.results }}"

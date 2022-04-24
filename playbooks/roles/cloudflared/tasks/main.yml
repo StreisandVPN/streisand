@@ -1,9 +1,11 @@
 ---
-- stat:
+- name: Check for CloudFlared binary
+  stat:
     path: "{{ cloudflared_bin_location }}/cloudflared"
   register: cloudflared_binary
 
-- set_fact:
+- name: Set fact for CloudFlare binary
+  set_fact:
     cloudflared_installed: "{{ cloudflared_binary.stat.exists | default(false) }}"
 
 - name: set device architecture and package manager vars
@@ -25,17 +27,18 @@
     state: present
   when: cloudflared_port|int < 1024
 
-- command: cloudflared update
+- name: Update CloudFlare Configuratino
+  command: cloudflared update
   register: update_command
   changed_when: update_command.rc == '64'
 
 - name: create cloudflared nologin user
-  become: yes
+  become: true
   user:
     name: cloudflared
     shell: /usr/sbin/nologin
-    system: True
-    create_home: False
+    system: true
+    create_home: false
 
 - name: set ownership of /usr/local/bin/cloudflared
   file:
@@ -43,6 +46,7 @@
     state: file
     owner: cloudflared
     group: cloudflared
+    mode: 0755
 
 - name: template config file
   template:
@@ -50,6 +54,7 @@
     dest: /etc/default/cloudflared
     owner: cloudflared
     group: cloudflared
+    mode: 0744
   notify: restart cloudflared service
   tags: systemd
 

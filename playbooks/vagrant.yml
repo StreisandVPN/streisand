@@ -2,7 +2,6 @@
 - import_playbook: python.yml
 
 - name: Prepare the vagrant VM for Ansible
-# =========================================
   hosts: streisand-host
   remote_user: "root"
   become: true
@@ -27,7 +26,7 @@
         path: "{{ streisand_ssh_private_key | expanduser | dirname }}"
         state: directory
         mode: 0700
-        recurse: yes
+        recurse: true
 
     - name: Create throwaway SSH key pair.
       shell: "ssh-keygen -h -t rsa -f {{ streisand_ssh_private_key }} -N ''"
@@ -39,4 +38,3 @@
 
 - import_playbook: ssh-setup.yml
 - import_playbook: streisand.yml
-...

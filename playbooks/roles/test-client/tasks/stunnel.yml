@@ -1,5 +1,4 @@
 ---
-
 # Import the Streisand OpenVPN playbook vars
 - include_vars: "../../openvpn/vars/main.yml"
 
@@ -8,14 +7,16 @@
     package:
       - "stunnel"
       - "openvpn"
+  register: task_result
+  until: task_result is succeeded
+  retries: 15
+  delay: 5
 
 - name: "Ensure the stunnel service is stopped and disabled"
-  # We need to stop the stunnel service & disable it. By default the Ubuntu 16.04
-  # stunnel package enables & boots the service after being installed.
   service:
     name: stunnel4
     state: stopped
-    enabled: no
+    enabled: false
 
 - name: "Remove existing stunnel test state from client if required"
   file:
@@ -31,14 +32,14 @@
     path: "{{ stunnel_dir }}"
     state: directory
 
-- name: "Download stunnel client configuration from the Streisand server gateway"
+- name: "Download stunnel client config from the Streisand server gateway"
   get_url:
     url: "{{ gateway_stunnel_conf }}"
     dest: "{{ stunnel_conf }}"
-    force_basic_auth: yes
+    force_basic_auth: true
     url_username: "{{ gateway_test_user }}"
     url_password: "{{ lookup('file', '{{ streisand_gateway_password_localpath }}') }}"
-    validate_certs: no
+    validate_certs: false
     mode: 0600
 
 - name: "Add a pidfile option to the client configuration"
@@ -48,7 +49,9 @@
     state: present
     insertbefore: BOF
 
-- name: "Generate a file with OpenVPN commands required to customize the profile for the test-client"
+- name: >
+    "Generate a file with OpenVPN commands required to customize the profile
+    for the test-client"
   template:
     src: "openvpn-profile-addons.j2"
     dest: "{{ openvpn_profile_addons }}"
@@ -64,7 +67,7 @@
     - name: "Read the stunnel daemon PID file into a var"
       command: "cat {{ stunnel_pid_file }}"
       register: stunnel_pid_output
-      changed_when: False
+      changed_when: false
 
     - name: "Download and test each OpenVPN stunnel profile"
       include_tasks: openvpn-test.yml
@@ -77,4 +80,4 @@
   rescue:
     - name: "kill stunnel instances"
       command: "killall stunnel4"
-      ignore_errors: "yes"
+      ignore_errors: "true"

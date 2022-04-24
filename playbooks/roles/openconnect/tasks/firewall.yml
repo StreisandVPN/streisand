@@ -20,7 +20,7 @@
 
 - name: Enable the ocserv-iptables service
   systemd:
-    daemon_reload: yes
+    daemon_reload: true
     name: ocserv-iptables.service
-    enabled: yes
+    enabled: true
     state: started

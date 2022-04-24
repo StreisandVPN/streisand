@@ -19,7 +19,6 @@
         project_download_baseurl: "{{ stunnel_base_download_url }}"
         project_download_files: "{{ stunnel_download_files }}"
         project_download_location: "{{ stunnel_mirror_location }}"
-        project_signer_keyid: "{{ stunnel_gpg_keyid }}"
 
   rescue:
     - name: "{{ streisand_mirror_warning }}"
@@ -31,7 +30,7 @@
   args:
     chdir: "{{ stunnel_mirror_location }}"
   register: stunnel_latest_check
-  changed_when: False
+  changed_when: false
 
 - name: Set the target stunnel version
   set_fact:

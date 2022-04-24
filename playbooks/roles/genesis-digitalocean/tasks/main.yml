@@ -5,7 +5,7 @@
 - name: "Get the {{ streisand_ssh_private_key }}.pub contents"
   command: "cat {{ streisand_ssh_private_key }}.pub"
   register: ssh_key
-  changed_when: False
+  changed_when: false
 
 - name: Set the DigitalOcean Access Token fact to the value that was entered, or attempt to retrieve it from the environment if the entry is blank
   set_fact:
@@ -32,8 +32,8 @@
         size: "{{ do_small_droplet_size_id }}"
         region: "{{ regions[do_region] }}"
         image: "{{ do_ubuntu_x64_image_id }}"
-        unique_name: yes
-        wait: yes
+        unique_name: true
+        wait: true
         oauth_token: "{{ do_access_token }}"
         state: present
       register: streisand_server

@@ -1,31 +1,63 @@
 ---
-- name: Warn users if the server's Linux distribution is not Ubuntu 16.04
-  pause:
-    prompt: "Ubuntu 16.04 is the only officially supported distribution; the setup will probably fail. Press Enter if you still want to continue."
-  when: not streisand_noninteractive and (ansible_distribution != "Ubuntu" or ansible_distribution_version != "16.04")
+- name: Load OS version-specific variables for role
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}_{{ ansible_distribution_version }}.yml"
+        - "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
+        - "{{ ansible_distribution }}.yml"
+        - "{{ ansible_os_family }}.yml"
+        - "default.yml"
+      paths:
+        - "{{ role_path }}/vars"
 
+- name: Warn users if the server's Linux distribution is not Supported
+  pause:
+    prompt: >
+      "This is not a supported version of Linux.  Please view the documentation
+      for a list of supported versions; the setup will probably fail. Press
+      Enter if you still want to continue."
+  when:
+    - not streisand_noninteractive
+    - not common_supported_version
 # Set default variables
 - import_tasks: set-default-variables.yml
 
 - name: Ensure the APT cache is up to date
   apt:
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 3600
+  register: task_result
+  until: task_result is succeeded
+  retries: 30
+  delay: 10
 
 - name: Install Streisand common packages
   apt:
     package: "{{ streisand_common_packages }}"
+  register: task_result
+  until: task_result is succeeded
+  retries: 30
+  delay: 10
 
 - name: Purge unneeded services
   apt:
     package: "{{ streisand_unneeded_packages }}"
     state: "absent"
-    purge: yes
-    autoremove: yes
+    purge: true
+    autoremove: true
+  register: task_result
+  until: task_result is succeeded
+  retries: 30
+  delay: 10
 
 - name: Perform a full system upgrade
   apt:
     upgrade: "safe"
+  register: task_result
+  until: task_result is succeeded
+  retries: 30
+  delay: 10
 
 - name: Copy the English BIP-0039 wordlist
   copy:
@@ -62,7 +94,9 @@
     - { src: "header.html", dest: "{{ streisand_header_template }}" }
     - { src: "footer.html", dest: "{{ streisand_footer_template }}" }
 
-- name: Generate the unattended-upgrades templates to enable automatic security updates
+- name: >
+    Generate the unattended-upgrades templates to enable automatic security
+    updates
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
@@ -70,9 +104,14 @@
     group: root
     mode: 0644
   with_items:
-    - { src: "20auto-upgrades.j2",       dest: "/etc/apt/apt.conf.d/20auto-upgrades" }
-    - { src: "50unattended-upgrades.j2", dest: "/etc/apt/apt.conf.d/50unattended-upgrades" }
-
+    - { src: "20auto-upgrades.j2", dest: "/etc/apt/apt.conf.d/20auto-upgrades" }
+    - {
+        src: "50unattended-upgrades.j2",
+        dest: "/etc/apt/apt.conf.d/50unattended-upgrades",
+      }
 - name: Apply the custom sysctl values
   include_role:
     name: sysctl
+
+- name: Import SSH tasks
+  import_tasks: ssh.yml

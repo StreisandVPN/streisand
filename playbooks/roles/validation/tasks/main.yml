@@ -62,7 +62,7 @@
 # vpn_clients set to 20 or less. 50 is probably fine. 254 will fail to
 # deploy.
 
-- name: Validate that the maximum number of clients is set to a reasonable amount
+- name: Validate that the maximum number of clients is set
   when: (vpn_clients > 20) or (vpn_clients < 1)
   fail:
     msg: |-

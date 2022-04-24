@@ -25,7 +25,8 @@
       pause:
         seconds: "{{ streisand_mirror_warning_seconds }}"
 
-- include_role:
+- name: Generating Documents
+  include_role:
     name: i18n-docs
   vars:
     title: "OpenConnect mirror"

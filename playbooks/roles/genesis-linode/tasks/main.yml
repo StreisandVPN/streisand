@@ -5,7 +5,7 @@
 - name: "Get the {{ streisand_ssh_private_key }}.pub contents"
   command: "cat {{ streisand_ssh_private_key }}.pub"
   register: ssh_key
-  changed_when: False
+  changed_when: false
 
 - name: "Create the server"
   linode_v4:

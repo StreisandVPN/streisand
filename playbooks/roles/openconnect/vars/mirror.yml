@@ -29,6 +29,15 @@ openconnect_macos_url: "https://github.com/openconnect/openconnect-gui/releases/
 openconnect_macos_checksum: "sha256:b2c338cfe9d0725bee98893225449e27cf7e337d43b0f8b08aec96de6f761f08"
 
 openconnect_download_urls:
-  - { url: "{{ openconnect_source_url }}",  checksum: "{{ openconnect_source_checksum }}" }
-  - { url: "{{ openconnect_windows_url }}", checksum: "{{ openconnect_windows_checksum }}" }
-  - { url: "{{ openconnect_macos_url }}", checksum: "{{ openconnect_macos_checksum }}" }
+  - {
+      url: "{{ openconnect_source_url }}",
+      checksum: "{{ openconnect_source_checksum }}",
+    }
+  - {
+      url: "{{ openconnect_windows_url }}",
+      checksum: "{{ openconnect_windows_checksum }}",
+    }
+  - {
+      url: "{{ openconnect_macos_url }}",
+      checksum: "{{ openconnect_macos_checksum }}",
+    }

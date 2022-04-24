@@ -3,9 +3,9 @@
 # already needs to be installed, which, implies that python is also installed.
 
 - hosts: localhost
-  gather_facts: yes
+  gather_facts: true
   remote_user: root
-  become: yes
+  become: true
   pre_tasks:
     # NOTE(@alimakki): Due to key rotation, we pre-emptivley
     # add the Google linux apt signing key required by some
@@ -17,10 +17,14 @@
   tasks:
     - name: Ensure consistent & clean apt state
       apt:
-        update_cache: yes
-        autoclean: yes
-        autoremove: yes
-        purge: yes
+        update_cache: true
+        autoclean: true
+        autoremove: true
+        purge: true
+      register: task_result
+      until: task_result is succeeded
+      retries: 15
+      delay: 5
 
     - name: Remove old LXD/LXC from distro
       apt:
@@ -28,12 +32,16 @@
           - lxd*
           - lxc*
         state: absent
-        autoremove: yes
-        purge: yes
+        autoremove: true
+        purge: true
 
     - name: Install snapd
       apt:
         name: snapd
+      register: task_result
+      until: task_result is succeeded
+      retries: 15
+      delay: 5
 
     - name: Install LXD snap
       snap:
@@ -67,7 +75,7 @@
     - name: Retrieve the Ubuntu Xenial AMD64 LXC image fingerprint
       uri:
         url: https://images.linuxcontainers.org/1.0/images/aliases/ubuntu/xenial/amd64
-        return_content: yes
+        return_content: true
       register: xenial_fingerprint
 
     - name: Launch streisand container (this will take a while)

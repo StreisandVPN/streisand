@@ -13,4 +13,4 @@
   unarchive:
     src: "/tmp/{{ cloudflared_file }}"
     dest: "{{ cloudflared_bin_location }}"
-    remote_src: yes
+    remote_src: true

@@ -26,7 +26,7 @@
   loop_control:
     loop_var: "client_name"
     label: "{{ client_name.item }}"
-  changed_when: False
+  changed_when: false
 
 - name: "Convert the {{ vpn_name }} client keys and certificates into PKCS #12 format"
   command: >

@@ -1,9 +1,10 @@
 ---
 - name: "Testing {{ profile_name }} OpenConnect PKCS12 client profile"
   block:
-    - name: "Read the {{ profile_name }} PKCS12 password from the mobileconfig file"
+    - name: "Read the {{ profile_name }} PKCS12 password from  mobileconfig"
       # Use `xmllint` to evaluate an XPATH against the client mobileconfig XML.
-      # The XPATH provided will extract the PKCS12 password for the given profile.
+      # The XPATH provided will extract the PKCS12 password for the given
+      # profile.
       #
       # Short breakdown of the XPATH expression:
       #   `/plist/dict/array/dict`
@@ -20,9 +21,9 @@
         xmllint --xpath '/plist/dict/array/dict/key[text()="Password"]/following-sibling::string[1]/text()' \
                 {{ openconnect_profile_dir }}/{{ profile_name }}.mobileconfig
       register: openconnect_pkcs12_password_contents
-      changed_when: False
+      changed_when: false
 
-    - name: "Start OpenConnect with PKCS12 auth and the {{ profile_name }} profile"
+    - name: "Start OpenConnect with PKCS12  and the {{ profile_name }} profile"
       # OpenConnect expects the PKCS12 password to be provided via stdin so we
       # use `echo -n` to send it to stdin without a newline.
       # We use `--background` as an argument to make sure the shell returns
@@ -41,7 +42,7 @@
     - name: "Read the OpenConnect PID file into a var"
       command: "cat {{ openconnect_pid_file }}"
       register: openconnect_pid_output
-      changed_when: False
+      changed_when: false
 
     - name: "Sleep a short time to allow OpenConnect to connect"
       pause:
@@ -50,12 +51,12 @@
     - name: "Register the updated /etc/resolv.conf contents"
       shell: "cat /etc/resolv.conf"
       register: openconnect_resolv_conf
-      changed_when: "False"
+      changed_when: "false"
 
     # TODO(@cpu) - We should be sending the dnsmasq server address down to
     # clients instead of Google DNS. We also shouldn't be sending a bogus
     # `search` parameter. For now, test against what Streisand does today.
-    - name: "Assert that /etc/resolv.conf was updated with the correct nameservers"
+    - name: "Assert that /etc/resolv.conf was updateds"
       assert:
         that:
           - "'nameserver 8.8.8.8' in openconnect_resolv_conf.stdout"
@@ -66,19 +67,19 @@
       get_url:
         url: "{{ external_test_url }}"
         dest: "/dev/null"
-        force: "yes"
+        force: "true"
 
     - name: "Stop OpenConnect"
       command: "kill -INT {{ openconnect_pid_output.stdout }}"
 
     - name: "Remove tun0 from resolvconf"
       command: "resolvconf -d tun0"
-      ignore_errors: "yes"
+      ignore_errors: true
 
     - name: "Register the updated /etc/resolv.conf contents"
       shell: "cat /etc/resolv.conf"
       register: openconnect_resolv_conf
-      changed_when: "False"
+      changed_when: false
 
     - name: "Assert that the DNS was restored to pre-OpenConnect state"
       assert:
@@ -95,10 +96,10 @@
   rescue:
     - name: "Bring down OpenConnect"
       command: "killall openconnect"
-      ignore_errors: "yes"
+      ignore_errors: true
     - name: "Remove tun0 from resolvconf"
       command: "resolvconf -d tun0"
-      ignore_errors: "yes"
+      ignore_errors: true
     - name: "Delete the tun0 interface"
       command: "ip link delete tun0"
-      ignore_errors: "yes"
+      ignore_errors: true

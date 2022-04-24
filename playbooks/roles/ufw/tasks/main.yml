@@ -2,6 +2,10 @@
 - name: Install UFW
   apt:
     package: ufw
+  register: task_result
+  until: task_result is succeeded
+  retries: 30
+  delay: 10
 
 - name: Disable UFW logging
   lineinfile:
@@ -29,6 +33,6 @@
 
 - name: Ensure UFW allows nginx
   ufw:
-    to_port: "{{ nginx_port }}"
+    to_port: "{{ web_port }}"
     proto: "tcp"
     rule: "allow"

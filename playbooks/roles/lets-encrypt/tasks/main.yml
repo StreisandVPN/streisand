@@ -1,20 +1,25 @@
+---
 - import_tasks: install.yml
 - import_tasks: firewall.yml
 
 # Now we try to request a certificate. If it fails. We print a warning and
 # fall back to self-signed certificates.
 - block:
-    - set_fact:
+    - name: Setting Lets Encrypt Email Address
+      set_fact:
         le_email_flag: "--email {{ streisand_admin_email }}"
       when: streisand_admin_email != ""
-    - set_fact:
+
+    - name: Setting Lets Encrypt Email Address
+      set_fact:
         le_email_flag: "--register-unsafely-without-email"
       when: streisand_admin_email == ""
 
     - name: Request initial certificate from Let's Encrypt
       # Use certbot's "standalone" plugin to listen on port 80 for the initial
       # challenge request/response. After this role runs, the nginx config
-      # handles port 80 requests, and whitelists the ACME challenge response dir.
+      # handles port 80 requests, and whitelists the ACME challenge response
+      # dir.
       command: |-
         certbot certonly --standalone -d {{ streisand_domain }}
         {{ le_email_flag }} --agree-tos --non-interactive
@@ -36,13 +41,21 @@
         section: renewalparams
         option: authenticator
         value: webroot
+        owner: root
+        group: root
+        mode: 0644
 
-    - name: Point webroot to the right directory where nginx will serve challenge responses.
+    - name: >
+        Point webroot to the right directory where nginx will serve challenge
+        responses.
       ini_file:
         path: "/etc/letsencrypt/renewal/{{ streisand_domain }}.conf"
         section: renewalparams
         option: webroot_path
         value: "{{ nginx_default_html_path }}"
+        owner: root
+        group: root
+        mode: 0644
 
     - name: Setup deploy hook to reload nginx after successful auto renewal
       copy:
@@ -52,13 +65,17 @@
         group: root
         mode: 0750
 
-    - set_fact:
-        le_ok: True
+    - name: Enabling Lets Encrypt
+      set_fact:
+        le_ok: true
 
   rescue:
-    - set_fact:
-        le_ok: False
+    - name: Disabling Lets Encrypt
+      set_fact:
+        le_ok: false
 
-    - name: Failed to get Let's Encrypt certificates. We are falling back to use self-signed ones. You could re-run the playbook to try again.
+    - name: >
+        Failed to get Let's Encrypt certificates. We are falling back to use
+        self-signed ones. You could re-run the playbook to try again.
       pause:
         seconds: 10

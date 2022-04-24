@@ -1,6 +1,6 @@
 ---
 - name: Prepare the new server for Ansible
-# =========================================
+  # =========================================
   hosts: streisand-host
   gather_facts: no
 
@@ -12,4 +12,7 @@
       raw: apt update && apt install python -y
       args:
         executable: /bin/bash
-...
+      register: python_install_result
+      until: python_install_result.rc == 0
+      retries: 15
+      delay: 15

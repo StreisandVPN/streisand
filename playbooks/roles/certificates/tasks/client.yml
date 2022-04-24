@@ -3,6 +3,9 @@
   file:
     path: "{{ tls_client_path }}/{{ client_name.stdout }}"
     state: directory
+    owner: root
+    group: root
+    mode: 0700
   with_items: "{{ vpn_client_names.results }}"
   loop_control:
     loop_var: "client_name"
@@ -21,7 +24,7 @@
 - name: Set the proper permissions on all private client keys
   file:
     path: "{{ ca_path }}"
-    recurse: yes
+    recurse: true
     state: directory
     owner: root
     group: root

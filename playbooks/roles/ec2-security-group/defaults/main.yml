@@ -1,0 +1,3 @@
+web_port: "443"
+openvpn_port: "636"
+openvpn_port_udp: "8757"

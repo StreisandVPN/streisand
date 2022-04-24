@@ -32,7 +32,7 @@
       # Nginx
       # ---
       - name: "AllowNGINX"
-        destination_port_range: "{{ nginx_port }}"
+        destination_port_range: "{{ web_port }}"
         protocol: Tcp
         access: Allow
         direction: Inbound

@@ -1,33 +1,74 @@
 ---
-- name: Ensure that BIND is not installed in order to avoid conflicts with dnsmasq
+- name: >
+    Ensure that BIND is not installed in order to avoid conflicts with dnsmasq
   apt:
     package: bind9
     state: absent
+  register: task_result
+  until: task_result is succeeded
+  retries: 15
+  delay: 5
 
 - name: Install dnsmasq
   apt:
     package: dnsmasq
+  register: task_result
+  until: task_result is succeeded
+  retries: 15
+  delay: 5
 
 - name: Generate the dnsmasq configuration file
   template:
     src: dnsmasq.conf.j2
     dest: /etc/dnsmasq.conf
+    owner: root
+    group: root
+    mode: 0644
   notify: Restart dnsmasq
 
 - name: Create the dnsmasq systemd drop-in configuration directory
   file:
     path: "{{ dnsmasq_systemd_service_path }}"
     state: directory
+    owner: root
+    group: root
+    mode: 0755
 
 - name: Generate the dnsmasq systemd drop-in service file
   template:
     src: dnsmasq.service.j2
     dest: "{{ dnsmasq_systemd_service_path }}/10-restart-failure.conf"
     mode: 0644
+    owner: root
+    group: root
+
+- name: Disable systemd-resolved Services
+  systemd:
+    name: systemd-resolved.service
+    enabled: false
+    state: stopped
+
+- name: Removing old /etc/resolv.conf file
+  file:
+    path: /etc/resolv.conf
+    state: absent
+
+- name: Configuring default DNS for NetworkManager
+  ansible.builtin.lineinfile:
+    path: /etc/NetworkManager/NetworkManager.conf
+    line: dns=default
+    insertafter: '\[main\]'
+    state: present
+
+- name: Restarting NetworkManager Services
+  systemd:
+    name: network-manager
+    enabled: true
+    state: restarted
 
 - name: Enable the dnsmasq service
   systemd:
-    daemon_reload: yes
+    daemon_reload: true
     name: dnsmasq.service
-    enabled: yes
+    enabled: true
     state: restarted

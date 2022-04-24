@@ -13,23 +13,25 @@
   get_url:
     url: "{{ gateway_ssh_key }}"
     dest: "{{ forward_ssh_key }}"
-    force_basic_auth: yes
+    force_basic_auth: true
     url_username: "{{ gateway_test_user }}"
     url_password: "{{ lookup('file', '{{ streisand_gateway_password_localpath }}') }}"
-    validate_certs: no
+    validate_certs: false
     mode: 0600
 
 - name: "Download the Streisand server SSH known hosts file"
   get_url:
     url: "{{ gateway_ssh_hosts }}"
     dest: "{{ forward_ssh_hosts }}"
-    force_basic_auth: yes
+    force_basic_auth: true
     url_username: "{{ gateway_test_user }}"
     url_password: "{{ lookup('file', '{{ streisand_gateway_password_localpath }}') }}"
-    validate_certs: no
+    validate_certs: false
     mode: 0600
 
-- name: "Install an SSH config file for a SSH SOCKS connection with the forward user"
+- name: >
+    "Install an SSH config file for a SSH SOCKS connection with the
+    forward user"
   template:
     src: "ssh-config.j2"
     dest: "{{ forward_ssh_config }}"
@@ -49,7 +51,7 @@
     - name: "Read the SSH connect PID file into a var"
       command: "cat {{ ssh_pid_file }}"
       register: ssh_pid_output
-      changed_when: False
+      changed_when: false
 
     - name: "Wait for port {{ forward_socks_port }} to become open"
       wait_for:
@@ -62,7 +64,7 @@
       # Don't warn about using command to execute curl - the get_url module
       # doesn't support specifying a socks5 proxy
       args:
-        warn: no
+        warn: false
 
     - name: "Stop the SSH connection"
       command: "kill {{ ssh_pid_output.stdout }}"
@@ -70,8 +72,7 @@
   rescue:
     - name: "kill any hanging SSH connections"
       command: "kill -9 {{ ssh_pid_output.stdout }}"
-      ignore_errors: "yes"
-
+      ignore_errors: "true"
 
 - name: "Test TinyProxy through a SSH forward user connection"
   block:
@@ -90,7 +91,7 @@
     - name: "Read the SSH connect PID file into a var"
       command: "cat {{ ssh_pid_file }}"
       register: ssh_pid_output
-      changed_when: False
+      changed_when: false
 
     - name: "Wait for port {{ tinyproxy_local_port }} to become open"
       wait_for:
@@ -103,7 +104,7 @@
       # Don't warn about using command to execute curl - the get_url module's
       # support for HTTP proxies isn't great
       args:
-        warn: no
+        warn: false
 
     - name: "Stop the SSH connection"
       command: "kill {{ ssh_pid_output.stdout }}"
@@ -111,4 +112,4 @@
   rescue:
     - name: "kill any hanging SSH connections"
       command: "kill -9 {{ ssh_pid_output.stdout }}"
-      ignore_errors: "yes"
+      ignore_errors: "true"

@@ -37,7 +37,7 @@
 
 - name: Enable the openvpn-iptables service
   systemd:
-    daemon_reload: yes
+    daemon_reload: true
     name: openvpn-iptables.service
-    enabled: yes
+    enabled: true
     state: started

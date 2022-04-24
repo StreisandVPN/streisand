@@ -6,7 +6,7 @@ tor_obfs4_port: 9443
 # the tor network. Using a value of 0 ensures the relay is private to the
 # streisand operator and their users. See the Tor documentation[0] for more
 # information:
-# [0]: https://www.torproject.org/docs/tor-manual.html.en#PublishServerDescriptor
+# https://www.torproject.org/docs/tor-manual.html.en#PublishServerDescriptor
 #
 tor_publish_service_desc: 0
 
@@ -15,3 +15,6 @@ tor_publish_service_desc: 0
 # `tor_publish_service_desc: 0` line above and uncomment the following line:
 #
 # tor_publish_service_desc: "bridge"
+
+streisand_mirror_warning: "One or more of the VPN clients could not be mirrored. Please file a bug report on GitHub so that the version number, checksum, or download location can be updated. Setup will now continue."
+streisand_mirror_warning_seconds: "20"

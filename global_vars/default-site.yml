@@ -7,21 +7,21 @@
 # The SSH private key that Ansible will use to connect to the Streisand node.
 # The associated public key will be used if required when provisioning cloud
 # nodes for the authorized_keys file.
-streisand_ssh_private_key: "~/.ssh/id_rsa"
+streisand_ssh_private_key: "~/.ssh/id_ed25519"
 
 vpn_clients: 10
 
 streisand_ad_blocking_enabled: no
-streisand_openconnect_enabled: yes
-streisand_openvpn_enabled: yes
-streisand_shadowsocks_enabled: yes
+streisand_openconnect_enabled: true
+streisand_openvpn_enabled: true
+streisand_shadowsocks_enabled: true
 streisand_shadowsocks_v2ray_enabled: no
-streisand_ssh_forward_enabled: yes
+streisand_ssh_forward_enabled: true
 # By default sshuttle is disabled because it creates a `sshuttle` user that has
 # full shell privileges on the Streisand host
 streisand_sshuttle_enabled: no
-streisand_stunnel_enabled: yes
-streisand_tinyproxy_enabled: yes
+streisand_stunnel_enabled: true
+streisand_tinyproxy_enabled: true
 streisand_tor_enabled: no
-streisand_wireguard_enabled: yes
+streisand_wireguard_enabled: true
 streisand_cloudflared_enabled: no

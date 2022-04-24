@@ -15,7 +15,9 @@
     - "{{ openvpn_profile_addons }}"
     - "{{ openvpn_pid_file }}"
 
-- name: "Generate a file with OpenVPN commands required to customize the profile for the test-client"
+- name: >
+    "Generate a file with OpenVPN commands required to customize the profile
+    for the test-client"
   template:
     src: "openvpn-profile-addons.j2"
     dest: "{{ openvpn_profile_addons }}"
@@ -30,6 +32,3 @@
   with_items:
     - "direct"
     - "sslh"
-    # TODO(@cpu) - debug direct-udp and combined profiles. They don't work r.n.
-    #- "direct-udp"
-    #- "combined"

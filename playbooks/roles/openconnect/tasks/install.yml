@@ -1,5 +1,4 @@
 ---
-
 # It *shouldn't* be necessary to run this particular apt_repository
 # call in a "retry" loop; enabling Universe doesn't reach out to the
 # network, so this shouldn't have transient failures. For the sake of
@@ -17,6 +16,10 @@
 - name: Install ocserv
   apt:
     package: ocserv
+  register: task_result
+  until: task_result is succeeded
+  retries: 15
+  delay: 5
 
 - name: Create the OpenConnect rsyslog configuration directory
   file:
@@ -26,7 +29,9 @@
     mode: 0644
     state: directory
 
-- name: Copy the modified rsyslog configuration into place that prevents OpenConnect traffic from being logged
+- name: >
+    Copy the modified rsyslog configuration into place that prevents
+    OpenConnect traffic from being logged
   copy:
     src: openconnect.conf
     dest: /etc/rsyslog.d/openconnect.d/openconnect.conf

@@ -1,5 +1,7 @@
 ---
-- name: Ensure that the Apache web server is not installed in order to avoid conflicts with Nginx
+- name: >
+    Ensure that the Apache web server is not installed in order to avoid
+    conflicts with Nginx
   apt:
     package: "{{ apache_packages_to_remove }}"
     state: absent
@@ -8,8 +10,8 @@
   apt_key:
     id: 7BD9BF62
     data: "{{ item }}"
-  with_file: nginx_signing.key
-  no_log: True
+  with_file: "{{ nginx_signing.key }}"
+  no_log: true
 
 - name: Add the official Nginx repository
   apt_repository:
@@ -19,10 +21,13 @@
   retries: "{{ apt_repository_retries }}"
   delay: "{{ apt_repository_delay }}"
 
-
 - name: Install Nginx
   apt:
     package: nginx
+  register: task_result
+  until: task_result is succeeded
+  retries: 15
+  delay: 5
 
 - name: Update Nginx configuration
   copy:
@@ -36,6 +41,9 @@
   file:
     path: /etc/nginx/{{ item }}
     state: directory
+    owner: root
+    group: root
+    mode: 0744
   with_items:
     - sites-available
     - sites-enabled
@@ -44,18 +52,23 @@
   file:
     path: "{{ nginx_systemd_service_path }}"
     state: directory
+    owner: root
+    group: root
+    mode: 0744
 
 - name: Generate the nginx systemd service file
   template:
     src: nginx.service.j2
     dest: "{{ nginx_systemd_service_path }}/10-restart-failure.conf"
+    owner: root
+    group: root
     mode: 0644
 
-# This directory is used to create ACME challenge responses when using letsencrypt.
-# N.B.: this should be different from streisand's gateway path to avoid any
-# chance of leaking gateway files (VPN credentials, configs, etc.) over port 80.
-# The nginx rules do redirect http to https, with the only exception
-# being requests to /.well-known/acme-challenge for letsencrypt.
+# This directory is used to create ACME challenge responses when using
+# letsencrypt.  N.B.: this should be different from streisand's gateway path
+# to avoid any chance of leaking gateway files (VPN credentials, configs,
+# etc.) over port 80.  The nginx rules do redirect http to https, with the
+# only exception being requests to /.well-known/acme-challenge for letsencrypt.
 # So there is probably a low risk of that ever happening,
 # but still, keeping them separate can't hurt.
 - name: Ensure the default nginx HTML directory is empty
@@ -64,14 +77,15 @@
     path: "{{ nginx_default_html_path }}/"
   when: streisand_le_enabled
 
-- file:
+- name: Generating NGINX HTML directory
+  file:
     state: directory
     path: "{{ nginx_default_html_path }}"
   when: streisand_le_enabled
 
 - name: Enable the nginx service
   systemd:
-    daemon_reload: yes
+    daemon_reload: true
     name: nginx.service
-    enabled: yes
+    enabled: true
     state: restarted

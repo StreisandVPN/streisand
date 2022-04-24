@@ -6,17 +6,21 @@
     state: present
   when: ansible_virtualization_type != 'lxc'
 
-- name: Add the Shadowsocks PPA
-  apt_repository:
-    repo: 'ppa:max-c-lv/shadowsocks-libev'
-  register: shadowsocks_add_apt_repository
-  until: not shadowsocks_add_apt_repository.failed
-  retries: "{{ apt_repository_retries }}"
-  delay: "{{ apt_repository_delay }}"
+# - name: Add the Shadowsocks PPA
+#   apt_repository:
+#     repo: 'ppa:max-c-lv/shadowsocks-libev'
+#   register: shadowsocks_add_apt_repository
+#   until: not shadowsocks_add_apt_repository.failed
+#   retries: "{{ apt_repository_retries }}"
+#   delay: "{{ apt_repository_delay }}"
 
 - name: Install shadowsocks-libev
   apt:
     package: "shadowsocks-libev"
+  register: task_result
+  until: task_result is succeeded
+  retries: 15
+  delay: 5
 
 - name: Create the shadowsocks-libev config directory
   file:
@@ -50,7 +54,7 @@
 - name: Register Shadowsocks password
   command: cat {{ shadowsocks_password_file }}
   register: shadowsocks_password
-  changed_when: False
+  changed_when: false
 
 # Add V2ray support
 - import_tasks: v2ray.yml
@@ -78,8 +82,8 @@
 - name: Enable the Shadowsocks service so it starts at boot, and bring it up
   systemd:
     name: shadowsocks-libev.service
-    daemon_reload: yes
-    enabled: yes
+    daemon_reload: true
+    enabled: true
     state: restarted
 
 # For some providers (e.g. GCE/AWS) the streisand_ipv4_address != the
@@ -88,15 +92,19 @@
 # former. This mess should probably be addressed in a more forward facing
 # manner.
 - block:
-    - name: "Check that the Shadowsocks service started ({{ streisand_ipv4_address }})"
+    - name: >
+        "Check that the Shadowsocks service started
+        ({{ streisand_ipv4_address }})"
       wait_for:
         host: "{{ streisand_ipv4_address }}"
         port: "{{ shadowsocks_server_port }}"
         state: started
         timeout: 30
-      ignore_errors: yes
+      ignore_errors: true
   rescue:
-    - name: "Check that the Shadowsocks service started ({{ ansible_default_ipv4.address }})"
+    - name: >
+        "Check that the Shadowsocks service started
+        ({{ ansible_default_ipv4.address }})"
       wait_for:
         host: "{{ ansible_default_ipv4.address }}"
         port: "{{ shadowsocks_server_port }}"

@@ -1,3 +1,4 @@
+---
 - name: Enable the Universe repository
   apt_repository:
     repo: "deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }} universe"
@@ -18,3 +19,7 @@
 - name: Install certbot
   apt:
     package: certbot
+  register: task_result
+  until: task_result is succeeded
+  retries: 15
+  delay: 5

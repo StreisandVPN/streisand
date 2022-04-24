@@ -1,8 +1,8 @@
 ---
 - hosts: streisand
-  gather_facts: yes
+  gather_facts: true
   remote_user: root
-  become: yes
+  become: true
   tasks:
     - set_fact:
         ansible_ssh_private_key_file: "{{ streisand_ssh_private_key }}"
@@ -15,7 +15,7 @@
         - name: Get the default SSH key
           command: "cat /tmp/id_rsa_insecure.pub"
           register: ssh_key
-          changed_when: False
+          changed_when: false
 
         - name: Ensure permissions on insecure key are correct
           file:
@@ -31,6 +31,10 @@
     - name: Ensure openssh is installed
       apt:
         package: openssh-server
+      register: task_result
+      until: task_result is succeeded
+      retries: 15
+      delay: 5
 
     - name: Add authorized key
       authorized_key:

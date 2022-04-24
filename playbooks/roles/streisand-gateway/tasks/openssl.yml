@@ -1,3 +1,4 @@
+---
 - name: Make the necessary directories for the certificate authority
   file:
     path: "{{ item }}"
@@ -16,8 +17,7 @@
     dest: "{{ openssl_ca_base }}/openssl-local.cnf"
 
 - name: Create private key and self-signed certificate for Nginx Certificate Authority.
-  command:
-    openssl req -new -nodes -x509
+  command: openssl req -new -nodes -x509
     -config "{{ openssl_ca_base }}/openssl-local.cnf"
     -days {{ nginx_days_valid }}
     -extensions v3_ca
@@ -29,8 +29,7 @@
     creates: "{{ openssl_ca_certificate }}"
 
 - name: Create a certificate signing request for a leaf certificate issued by the Nginx CA
-  command:
-    openssl req -new -nodes
+  command: openssl req -new -nodes
     -config "{{ openssl_ca_base }}/openssl-local.cnf"
     -days {{ nginx_days_valid }}
     -newkey rsa:{{ streisand_gateway_rsa_key_size }}
@@ -48,14 +47,17 @@
     group: root
     mode: 0600
 
-- name: Seed a blank database file that will be used when generating the self-signed certificate
+- name: >
+    Seed a blank database file that will be used when generating the
+    self-signed certificate
   file:
     path: "{{ openssl_ca_base }}/index.txt"
     state: touch
 
-- name: Process certificate signing request with the Nginx CA to create leaf certificate
-  command:
-    openssl ca
+- name: >
+    Process certificate signing request with the Nginx CA to create
+    leaf certificate
+  command: openssl ca
     -batch
     -create_serial
     -config "{{ openssl_ca_base }}/openssl-local.cnf"
@@ -66,22 +68,20 @@
   args:
     creates: "{{ nginx_self_signed_certificate }}"
 
-- name: Remove the CA private key. It has signed its first and last certificate.
+- name: Remove the CA private key.
   file:
     path: "{{ openssl_ca_key }}"
     state: absent
 
 - name: Register MITM mitigation fact (leaf certificate serial number)
-  command:
-    openssl x509
+  command: openssl x509
     -in {{ nginx_self_signed_certificate }}
     -noout
     -serial
   register: ssl_certificate_serial_number
 
 - name: Register more MITM mitigation facts (fingerprints)
-  command:
-    openssl x509
+  command: openssl x509
     -{{ item }}
     -in {{ nginx_self_signed_certificate }}
     -noout -fingerprint

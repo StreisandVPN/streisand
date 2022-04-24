@@ -6,7 +6,7 @@
 
 - name: Add the Tor repository
   apt_repository:
-    repo: 'deb https://deb.torproject.org/torproject.org {{ ansible_lsb.codename }} main'
+    repo: "deb https://deb.torproject.org/torproject.org {{ ansible_lsb.codename }} main"
   register: tor_add_apt_repository
   until: not tor_add_apt_repository.failed
   retries: "{{ apt_repository_retries }}"
@@ -15,12 +15,20 @@
 - name: Install the package to keep the Tor signing key current
   apt:
     package: deb.torproject.org-keyring
+  register: task_result
+  until: task_result is succeeded
+  retries: 15
+  delay: 5
 
 - name: Install obfs4 and Tor
   apt:
     package:
       - obfs4proxy
       - tor
+  register: task_result
+  until: task_result is succeeded
+  retries: 15
+  delay: 5
 
 # Update the firewall to allow Tor and obfs4proxy
 # NOTE(@cpu): we do this early in the role because the Tor daemon will check if
@@ -36,7 +44,7 @@
 - name: Register the bridge's random Nickname
   command: cat {{ tor_bridge_nickname_file }}
   register: tor_bridge_nickname
-  changed_when: False
+  changed_when: false
 
 - name: Generate the bridge config file
   template:
@@ -61,20 +69,23 @@
 #     /usr/bin/obfsproxy ix,
 #     /usr/bin/obfs4proxy ix,
 # but doing so results in an error from the existing `PUx` modifiers:
-#     profile system_tor: has merged rule /usr/bin/obfs4proxy with conflicting x modifiers
-# in the interest of fixing a regression we work around this by changing the
-# dist provided `/etc/apparmor.d/abstractions/tor` file.
+# profile system_tor: has merged rule /usr/bin/obfs4proxy with
+# conflicting x modifiers in the interest of fixing a regression
+# we work around this by changing the dist provided
+# `/etc/apparmor.d/abstractions/tor` file.
 - name: Fix the distro Tor apparmor abstraction
   replace:
     path: /etc/apparmor.d/abstractions/tor
     regexp: '^([\s]*)/usr/bin/(obfs4?proxy) PUx,$'
     replace: '\1/usr/bin/\2 ix,'
-    backup: yes
+    backup: true
 
 - name: Reload the system_tor AppArmor profile for the override to take effect
   command: apparmor_parser -r /etc/apparmor.d/system_tor
 
-- name: Restart Tor so the server fingerprint will be available in the state file, and the hidden service for the Gateway will start running
+- name: >
+    Restart Tor so the server fingerprint will be available in the state file,
+    and the hidden service for the Gateway will start running
   service:
     name: tor
     state: restarted
@@ -94,14 +105,14 @@
 
 - name: Register the Tor Hidden Service hostname
   command: cat {{ tor_hidden_service_directory }}/hostname
-  register: tor_hidden_service_hostname_output
-  changed_when: False
+  register: tor_hidden_svr_hostname_output
+  changed_when: false
 
 - name: Register the Tor Hidden Service URL fact
   set_fact:
-    tor_hidden_service_url: "http://{{ tor_hidden_service_hostname_output.stdout }}"
+    tor_hidden_service_url: "http://{{ tor_hidden_svr_hostname_output.stdout }}"
 
-- name: Generate the hidden service virtual host and restart Nginx if it is updated
+- name: Generate the hidden service virtual host and restart Nginx
   template:
     src: hidden-service-vhost.j2
     dest: /etc/nginx/sites-available/streisand-hidden-service
@@ -123,18 +134,18 @@
 - name: Discover the obfs4 certificate details
   shell: cat "{{ tor_obfs_state_directory }}/obfs4_bridgeline.txt" | grep 'Bridge obfs4' | sed -e 's/^.*cert=\(.*\) .*$/\1/'
   register: tor_obfs4_certificate
-  changed_when: False
+  changed_when: false
 
 # Generate the docs gateway page
 - import_tasks: docs.yml
 
 # This needs to be done after the docs folder structure is generated
-- name: Copy the hidden service hostname to the webroot when in test client mode
+- name: Copy the hidden service hostname to the webroot when in test  mode
   copy:
     src: "{{ tor_hidden_service_directory }}/hostname"
-    remote_src: yes
+    remote_src: true
     dest: "{{ tor_gateway_location }}/hidden-service-hostname.txt"
-    force: yes
+    force: true
 
 # Mirror the Tor browser bundle
 - import_tasks: mirror.yml

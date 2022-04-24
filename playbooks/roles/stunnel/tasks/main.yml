@@ -2,6 +2,10 @@
 - name: Install stunnel
   apt:
     package: stunnel4
+  register: task_result
+  until: task_result is succeeded
+  retries: 15
+  delay: 5
 
 - name: Generate the stunnel private key
   command: openssl genrsa -out {{ stunnel_key }} {{ stunnel_key_size }}
@@ -40,7 +44,7 @@
   systemd:
     name: stunnel4.service
     state: stopped
-    masked: yes
+    masked: true
 
 - name: Copy the stunnel system unit file
   template:
@@ -50,9 +54,9 @@
 
 - name: Enable the stunnel service
   systemd:
-    daemon_reload: yes
+    daemon_reload: true
     name: stunnel.service
-    enabled: yes
+    enabled: true
     state: restarted
 
 # Set up the stunnel firewall rules

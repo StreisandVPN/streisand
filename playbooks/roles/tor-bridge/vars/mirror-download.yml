@@ -21,7 +21,19 @@ tor_browser_bundle_linux64_sig_filename: "{{ tor_browser_bundle_linux64_filename
 tor_signer_keyid: "D9FF06E2"
 
 tor_download_files:
-  - { "file": "{{ tor_browser_bundle_windows_filename }}", "sig": "{{ tor_browser_bundle_windows_sig_filename }}" }
-  - { "file": "{{ tor_browser_bundle_macos_filename }}", "sig": "{{ tor_browser_bundle_macos_sig_filename  }}" }
-  - { "file": "{{ tor_browser_bundle_linux32_filename }}", "sig": "{{ tor_browser_bundle_linux32_sig_filename  }}" }
-  - { "file": "{{ tor_browser_bundle_linux64_filename }}", "sig": "{{ tor_browser_bundle_linux64_sig_filename  }}" }
+  - {
+      "file": "{{ tor_browser_bundle_windows_filename }}",
+      "sig": "{{ tor_browser_bundle_windows_sig_filename }}",
+    }
+  - {
+      "file": "{{ tor_browser_bundle_macos_filename }}",
+      "sig": "{{ tor_browser_bundle_macos_sig_filename  }}",
+    }
+  - {
+      "file": "{{ tor_browser_bundle_linux32_filename }}",
+      "sig": "{{ tor_browser_bundle_linux32_sig_filename  }}",
+    }
+  - {
+      "file": "{{ tor_browser_bundle_linux64_filename }}",
+      "sig": "{{ tor_browser_bundle_linux64_sig_filename  }}",
+    }

@@ -1,9 +1,9 @@
 ---
 - name: Provision the Rackspace Server
-# ====================================
+  # ====================================
   hosts: localhost
   connection: local
-  gather_facts: yes
+  gather_facts: true
 
   vars:
     regions:
@@ -48,4 +48,3 @@
 - import_playbook: ssh-setup.yml
 - import_playbook: cloud-status.yml
 - import_playbook: streisand.yml
-...

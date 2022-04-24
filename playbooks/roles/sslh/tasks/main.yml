@@ -3,6 +3,10 @@
   apt:
     package: sslh
     install_recommends: false
+  register: task_result
+  until: task_result is succeeded
+  retries: 30
+  delay: 10
 
 - name: Generate the sslh port multiplexer systemd defaults file
   template:
@@ -29,7 +33,7 @@
 
 - name: Enable the sslh service
   systemd:
-    daemon_reload: yes
+    daemon_reload: true
     name: sslh.service
-    enabled: yes
+    enabled: true
     state: restarted

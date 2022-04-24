@@ -3,12 +3,12 @@
     - name: "Replace wg0 with the {{ profile_name }} configuration"
       copy:
         src: "{{ wireguard_profile_dir }}/{{ profile_name }}.conf"
-        remote_src: yes
+        remote_src: true
         dest: "/etc/wireguard/wg0.conf"
         mode: 0600
         owner: root
         group: root
-        force: yes
+        force: true
 
     - name: "Bring up the WireGuard interface for the {{ profile_name }} config"
       shell: "wg-quick up wg0"
@@ -16,23 +16,23 @@
     - name: "Register the updated /etc/resolv.conf contents"
       shell: "cat /etc/resolv.conf"
       register: wgclient_resolv_conf
-      changed_when: "False"
+      changed_when: "false"
 
-    - name: "Assert that /etc/resolv.conf was updated for the DNSMasq WireGuard IP"
+    - name: "Assert that /etc/resolv.conf was updated for the WireGuard IP"
       assert:
         that:
-          - "'nameserver {{ dnsmasq_wireguard_ip }}' in wgclient_resolv_conf.stdout"
+          - "'nameserver {{ wireguard_ip }}' in wgclient_resolv_conf.stdout"
 
     - name: "Check {{ external_test_url }} through the WireGuard route"
       get_url:
         url: "{{ external_test_url }}"
         dest: "/dev/null"
-        force: "yes"
+        force: "true"
 
     - name: "Register the output from `wg` to check Wireguard status"
       shell: "wg"
       register: wgclient_wg_output
-      changed_when: "False"
+      changed_when: "false"
 
     - name: "Assert that there has been a successful Wireguard handshake"
       assert:
@@ -45,13 +45,13 @@
     - name: "Register the updated /etc/resolv.conf contents"
       shell: "cat /etc/resolv.conf"
       register: wgclient_resolv_conf
-      changed_when: "False"
+      changed_when: "false"
 
     - name: "Assert that the DNS was restored to pre-WireGuard state"
       assert:
         that:
-          - "'nameserver {{ dnsmasq_wireguard_ip }}' not in wgclient_resolv_conf.stdout"
+          - "'nameserver {{ wireguard_ip }}' not in wgclient_resolv_conf.stdout"
   rescue:
     - name: "Remove the wg0 interface if present"
       command: "wg-quick down wg0"
-      ignore_errors: "yes"
+      ignore_errors: "true"

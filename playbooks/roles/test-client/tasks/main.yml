@@ -15,7 +15,7 @@
 
 - name: "Copy gateway password file to client"
   copy:
-    src: "{{ streisand_gateway_password_localpath }}"
+    src: "{{ streisand_gw_password_path }}"
     dest: "{{ gateway_password_file }}"
     owner: root
     group: root
@@ -43,10 +43,10 @@
   get_url:
     url: "{{ gateway_profile_inventory }}"
     dest: "{{ test_client_profiles_file }}"
-    force_basic_auth: yes
+    force_basic_auth: true
     url_username: "{{ gateway_test_user }}"
     url_password: "{{ lookup('file', '{{ streisand_gateway_password_localpath }}') }}"
-    validate_certs: no
+    validate_certs: false
     mode: 0600
 
 - name: "Register the client profile list contents"
@@ -73,4 +73,3 @@
 
 # Run the Stunnel tests
 - import_tasks: stunnel.yml
-...

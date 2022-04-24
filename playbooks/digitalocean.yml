@@ -1,21 +1,21 @@
 ---
 - name: Provision the DigitalOcean Server
-# =======================================
+  # =======================================
   hosts: localhost
   connection: local
-  gather_facts: yes
+  gather_facts: true
 
   vars:
     regions:
-      "1":  "ams2"
-      "2":  "ams3"
-      "3":  "blr1"
-      "4":  "fra1"
-      "5":  "lon1"
-      "6":  "nyc1"
-      "7":  "nyc2"
-      "8":  "nyc3"
-      "9":  "sfo1"
+      "1": "ams2"
+      "2": "ams3"
+      "3": "blr1"
+      "4": "fra1"
+      "5": "lon1"
+      "6": "nyc1"
+      "7": "nyc2"
+      "8": "nyc3"
+      "9": "sfo1"
       "10": "sfo2"
       "11": "sgp1"
       "12": "tor1"
@@ -48,18 +48,18 @@
     - name: "do_access_token_entry"
       prompt: |
 
-          Personal Access Tokens allow Streisand to create a droplet for you.
-          New Personal Access Tokens can be generated in the DigitalOcean control panel.
-          To generate a new token please do the following:
-                * Go to https://cloud.digitalocean.com/settings/applications
-                * Click 'Generate New Token'
-                * Give the token a name (it is arbitrary)
-                * Be sure to select the 'Write' scope as well (this is not optional)
-                * Click 'Generate Token'
-                * Copy the long string that is generated and paste it below.
-          If this field is left blank, the environment variable DO_API_KEY will be used.
+        Personal Access Tokens allow Streisand to create a droplet for you.
+        New Personal Access Tokens can be generated in the DigitalOcean control panel.
+        To generate a new token please do the following:
+              * Go to https://cloud.digitalocean.com/settings/applications
+              * Click 'Generate New Token'
+              * Give the token a name (it is arbitrary)
+              * Be sure to select the 'Write' scope as well (this is not optional)
+              * Click 'Generate Token'
+              * Copy the long string that is generated and paste it below.
+        If this field is left blank, the environment variable DO_API_KEY will be used.
 
-          What is your DigitalOcean Personal Access Token?
+        What is your DigitalOcean Personal Access Token?
       private: no
 
     - name: "do_ssh_name"
@@ -76,4 +76,3 @@
 - import_playbook: ssh-setup.yml
 - import_playbook: cloud-status.yml
 - import_playbook: streisand.yml
-...

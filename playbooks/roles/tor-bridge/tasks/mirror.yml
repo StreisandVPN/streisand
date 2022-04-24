@@ -9,7 +9,7 @@
     # Include the mirror-common tasks
     - import_tasks: mirror-common.yml
 
-      # Download the Tor browser in each locale, verifying GPG signatures.
+    # Download the Tor browser in each locale, verifying GPG signatures.
     - include_role:
         name: download-and-verify
       vars:
@@ -17,7 +17,6 @@
         project_download_baseurl: "{{ tor_base_download_url }}"
         project_download_files: "{{ tor_download_files }}"
         project_download_location: "{{ tor_mirror_location }}"
-        project_signer_keyid: "{{ tor_signer_keyid }}"
       with_items: "{{ streisand_languages.values() | map(attribute='tor_locale') | list }}"
       when: locale in tor_available_locales
       loop_control:

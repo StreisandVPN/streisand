@@ -12,9 +12,9 @@
 
 - name: Enable and start systemd networking
   systemd:
-    daemon_reload: yes
+    daemon_reload: true
     name: systemd-networkd.service
-    enabled: yes
+    enabled: true
     state: restarted
 
 - name: Install dnsmasq for service0 network

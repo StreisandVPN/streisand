@@ -1,13 +1,13 @@
 ---
-
 root_gpg_dir: "/root/.gnupg"
 
 # Keep Streisand's GPG cruft out of the way
 streisand_gpg_dir: "{{ root_gpg_dir }}/streisand"
 
 # GPG Keyserver's Root CA Cert
-# Currently the keyserver is using an Amazon certificate, whose root CA is signed
-# by "Starfield Services", which should be available by default in /etc/ssl/certs
+# Currently the keyserver is using an Amazon certificate, whose root CA is
+# signed by "Starfield Services", which should be available by default in
+# /etc/ssl/certs
 streisand_gpg_keyserver_root_ca: "Starfield_Services_Root_Certificate_Authority_-_G2.pem"
 
 # Where is the Streisand specific GPG keyring kept?
@@ -21,35 +21,26 @@ streisand_default_gpg_flags: "--no-default-keyring --keyring {{ streisand_gpg_ke
 # built into the GNUPG distribution, so we don't need to specify a CA cert
 # explicitly in a dirmngr config if we stick with this particular pool.
 # By default use HKP over HTTPS to the SKS Keyserver pool
-streisand_gpg_keyserver_address: "hkps://gpg.mozilla.org"
+streisand_gpg_keyserver_address: "hkps://keys.openpgp.org"
 
 # The default timeout is 30s, we use something larger
 streisand_gpg_timeout: "120"
 # Specify some options when searching for keys in the keyserver
-streisand_default_key_import_flags: "--keyserver-options timeout={{ streisand_gpg_timeout }}"
+streisand_default_key_import_flags: >
+  "--keyserver-options timeout={{ streisand_gpg_timeout }}"
 
-# Which keys from files/ do we add to the keyring in first setup? These keys are
-# trusted ultimately to verify software signatures during Streisand provisioning.
+# Which keys from files/ do we add to the keyring in first setup? These keys
+# are trusted ultimately to verify software signatures during Streisand
+# provisioning.
 streisand_bootstrap_gpg_keys:
   # OpenVPN release signing key
-  - 2F2B01E7.security@openvpn.net.asc
+  - F554A3687412CFFEBDEFE0A312F5F7B42F2B01E7.security@openvpn.net.asc
   # Openconnect
-  - 7F343FA7.nmav@redhat.com.asc
-  - 96865171.nmav@gnutls.org.asc
+  - 56EE7FA9E8173B19FE86268D763712747F343FA7.nmav@redhat.com.asc
+  - 1F42418905D8206AA754CCDC29EE58B996865171.nmav@gnutls.org.asc
   # Tor browser release signing key
-  - 93298290.torbrowser@torproject.org.asc
+  - EF6E286DDA85EA2A4BA7DE684E2C6E8793298290.torbrowser@torproject.org.asc
   # PuTTY release signing key
-  - 4AE8DA82.putty@projects.tartarus.org.asc
+  - E27394ACA3F9D9049522E0546289A25F4AE8DA82.putty@projects.tartarus.org.asc
   # Stunnel release signing key
-  - DD3AAAA3.Michal.Trojnara@stunnel.org.asc
-  # Streisand maintainer - Github @cpu
-  - 2D8330C2.daniel@binaryparadox.net.asc
-  # Streisand maintainer - Github @jlund
-  - CDF6583E.josh@joshlund.com.asc
-  # Streisand maintainer - Github @nopdotcom
-  - F67DA905.nop@nop.com.asc
-  # Streisand maintainer - Github @CorbanR
-  - A697A56F.corban@raunco.co.asc
-  # Streisand maintainer - Github @alimakki (Commented out for now because it
-  # breaks CI)
-  #- AF16234E.alimakki@gmail.com.asc
+  - AC915EA30645D9D3D4DAE4FEB1048932DD3AAAA3.Michal.Trojnara@stunnel.org.asc

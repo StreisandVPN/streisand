@@ -1,5 +1,6 @@
 ---
-# Use OpenSSL to generate self-signed certificates if we do not have Let's Encrypt.
+# Use OpenSSL to generate self-signed certificates if we do not
+# have Let's Encrypt.
 - import_tasks: openssl.yml
   when: not le_ok
 
@@ -14,11 +15,15 @@
 - name: Register the Gateway password
   command: cat {{ streisand_gateway_password_file }}
   register: streisand_gateway_password
-  changed_when: False
+  changed_when: false
 
 - name: Install the required package for the htpasswd command
   apt:
     package: apache2-utils
+  register: task_result
+  until: task_result is succeeded
+  retries: 15
+  delay: 5
 
 - name: Generate the htpasswd file
   command: htpasswd -b -c {{ streisand_gateway_htpasswd_file }} {{ streisand_gateway_username }} {{ streisand_gateway_password.stdout }}
@@ -35,9 +40,9 @@
 - name: Copy the Streisand gateway password file locally
   fetch:
     src: "{{ streisand_gateway_password_file }}"
-    dest: "{{ streisand_gateway_password_localpath }}"
-    fail_on_missing: yes
-    flat: yes
+    dest: "{{ streisand_gw_password_path }}"
+    fail_on_missing: true
+    flat: true
   when: streisand_client_test
 
 - name: Generate the virtual host and restart Nginx if it is updated
@@ -55,8 +60,6 @@
     src: /etc/nginx/sites-available/streisand
     state: link
 
-  # TODO:
-  #   Add to CI testing https://github.com/StreisandEffect/streisand/issues/643
 - block:
     - name: Keep a copy of our diagnostics on the server
       copy:
@@ -69,14 +72,16 @@
     # fetch and clean up
     - include_tasks: fetch-and-cleanup.yml
 
-    - name: Ensure that all of the files in the Gateway have the proper permissions
+    - name: >
+        Ensure that all of the files in the Gateway
+        have the proper permissions
       file:
         path: "{{ streisand_gateway_location }}"
         owner: www-data
         group: www-data
         mode: 0750
         state: directory
-        recurse: yes
+        recurse: true
 
     - meta: flush_handlers
 
@@ -87,13 +92,13 @@
 
         - name: Attempt to open the instructions on Linux (if applicable). Errors in this task are ignored because the `xdg-open` command is not always available.
           local_action: command xdg-open ../{{ streisand_local_directory }}/{{ streisand_server_name }}.html
-          ignore_errors: yes
+          ignore_errors: true
           when: hostvars['127.0.0.1']['ansible_system'] == "Linux"
-          become: no
+          become: false
 
         - name: Open the instructions on macOS (if applicable)
           local_action: command open ../{{ streisand_local_directory }}/{{ streisand_server_name }}.html
           when: hostvars['127.0.0.1']['ansible_system'] == "Darwin"
-          become: no
+          become: false
       when: not streisand_noninteractive
   when: not streisand_ci

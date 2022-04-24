@@ -1,8 +1,12 @@
 ---
-stunnel_cert_country:  "GB"
+stunnel_cert_country: "GB"
 stunnel_cert_province: "Berkshire"
 stunnel_cert_city: "Slough"
 stunnel_cert_org: "Wernham Hogg Paper Company"
 stunnel_cert_ou: "Gareth Keenan Investigations"
 
 stunnel_key_size: "3072"
+
+streisand_mirror_warning: "One or more of the VPN clients could not be mirrored. Please file a bug report on GitHub so that the version number, checksum, or download location can be updated. Setup will now continue."
+streisand_mirror_warning_seconds: "20"
+openvpn_port: "636"

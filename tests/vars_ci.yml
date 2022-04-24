@@ -1,4 +1,4 @@
-streisand_ci: yes
+streisand_ci: true
 
 streisand_ssh_private_key: "/tmp/id_rsa_insecure"
 

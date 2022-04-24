@@ -1,7 +1,7 @@
 ---
 - name: Add the repo for getting the latest version of Go
   apt_repository:
-    repo: 'ppa:longsleep/golang-backports'
+    repo: "ppa:longsleep/golang-backports"
   register: golang_add_apt_repository
   until: not golang_add_apt_repository.failed
   retries: "{{ apt_repository_retries }}"
@@ -10,6 +10,10 @@
 - name: Install golang-go
   apt:
     package: "golang-go"
+  register: task_result
+  until: task_result is succeeded
+  retries: 30
+  delay: 10
 
 # Temporary workaround for insecure v2ray.com redirection
 # see https://github.com/StreisandEffect/streisand/issues/1642
@@ -31,4 +35,3 @@
 
 - name: Copying v2ray-plugin to shadowsocks-libev directory
   shell: "cp -rf {{ v2ray_location }}/v2ray-plugin {{ shadowsocks_location }}"
-...

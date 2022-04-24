@@ -18,17 +18,18 @@
     mode: 0750
     state: directory
 
-- include_role:
+- name: Generating Certificates
+  include_role:
     name: certificates
   vars:
-    ca_path:            "{{ ocserv_path }}"
-    tls_ca:             "{{ ocserv_ca }}"
-    tls_client_path:    "{{ ocserv_path }}"
-    tls_key_ou:         "{{ ocserv_key_ou }}"
-    vpn_name:           "ocserv"
-    generate_ca_server: yes
-    generate_client:    yes
-    generate_pkcs:      yes
+    ca_path: "{{ ocserv_path }}"
+    tls_ca: "{{ ocserv_ca }}"
+    tls_client_path: "{{ ocserv_path }}"
+    tls_key_ou: "{{ ocserv_key_ou }}"
+    vpn_name: "ocserv"
+    generate_ca_server: true
+    generate_client: true
+    generate_pkcs: true
     tls_server_common_name_file: "{{ ocserv_server_common_name_file }}"
     tls_sans:
       - "{{ streisand_ipv4_address }}"
@@ -36,7 +37,7 @@
 - name: Base64 encode the client PKCS12 file(s)
   command: "openssl base64 -in {{ ocserv_path }}/{{ client_name.stdout }}/{{ client_name.stdout }}.p12"
   register: ocserv_clients_base64
-  changed_when: False
+  changed_when: false
   with_items: "{{ vpn_client_names.results }}"
   loop_control:
     loop_var: "client_name"
@@ -45,22 +46,22 @@
 - name: Generate a UUID for .mobileconfig client PKCS12 certificate
   command: uuid -v4
   register: ocserv_client_mobileconfig_uuid
-  changed_when: False
+  changed_when: false
 
 - name: Generate a UUID for .mobileconfig vpn payload identifier
   command: uuid -v4
   register: ocserv_payload_mobileconfig_uuid
-  changed_when: False
+  changed_when: false
 
 - name: Generate a UUID for .mobileconfig config payload identifier
   command: uuid -v4
   register: ocserv_config_mobileconfig_uuid
-  changed_when: False
+  changed_when: false
 
 - name: Generate a UUID for .mobileconfig global identifier
   command: uuid -v4
   register: ocserv_global_mobileconfig_uuid
-  changed_when: False
+  changed_when: false
 
 - name: Generate the iOS client mobileconfig file(s)
   template:
@@ -92,7 +93,7 @@
 - name: Register the ocserv password
   command: cat {{ ocserv_password_file }}
   register: ocserv_password
-  changed_when: False
+  changed_when: false
 
 - name: Create an ocpasswd credentials file
   expect:
@@ -120,13 +121,17 @@
   systemd:
     name: ocserv.socket
     state: stopped
-    enabled: no
+    enabled: false
+  register: task_result
+  failed_when:
+    - task_result.failed
+    - '"Could not find the requested service" not in task_result.msg'
 
 - name: Enable the ocserv service
   systemd:
-    daemon_reload: yes
+    daemon_reload: true
     name: ocserv.service
-    enabled: yes
+    enabled: true
     state: restarted
 
 # Set up the openconnect firewall rules

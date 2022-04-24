@@ -5,7 +5,7 @@
 - name: "Get the {{ streisand_ssh_private_key }}.pub contents"
   command: "cat {{ streisand_ssh_private_key }}.pub"
   register: ssh_key
-  changed_when: False
+  changed_when: false
 
 - name: Remove the 'streisand' SSH key from Amazon if it already exists. This is to prevent problems if two people with two different keys are sharing the same AWS account.
   ec2_key:
@@ -14,7 +14,7 @@
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
     region: "{{ aws_region }}"
-    wait: yes
+    wait: true
 
 - name: Add the SSH key to Amazon under the name of 'streisand-ssh'
   ec2_key:
@@ -23,7 +23,7 @@
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
     region: "{{ aws_region }}"
-    wait: yes
+    wait: true
 
 - name: Determine which AMI to use
   ec2_ami_facts:
@@ -40,7 +40,7 @@
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
     instance_type: "{{ aws_instance_type }}"
-    image: "{{ ami.images|sort(reverse=True,attribute='name')|map(attribute='image_id')|first }}"
+    image: "{{ ami.images|sort(reverse=true,attribute='name')|map(attribute='image_id')|first }}"
     region: "{{ aws_region }}"
     vpc_subnet_id: "{{ aws_vpc_subnet_id | default(omit) }}"
     assign_public_ip: "{{ (aws_vpc_subnet_id is defined and aws_vpc_subnet_id != '') or omit }}"
@@ -48,7 +48,7 @@
     group: "{{ aws_security_group }}"
     instance_tags:
       Name: "{{ aws_instance_name }}"
-    wait: yes
+    wait: true
   register: streisand_server
 
 - name: Create CloudWatch alarm to auto-recover instance
@@ -93,7 +93,7 @@
     name: "{{ instance_eip.public_ip }}"
     groups: streisand-host
     ansible_user: ubuntu
-    ansible_become: yes
+    ansible_become: true
 
 - name: Set the streisand_ipv4_address variable
   set_fact:

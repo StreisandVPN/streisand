@@ -1,5 +1,4 @@
 ---
-
 # Import the Streisand OpenConnect playbook default vars
 - include_vars: "../../openconnect/defaults/main.yml"
 
@@ -20,6 +19,10 @@
 - name: "Install OpenConnect & required tools"
   apt:
     name: "{{ item }}"
+  register: task_result
+  until: task_result is succeeded
+  retries: 15
+  delay: 5
   with_items:
     - "openconnect"
     # libxml2-utils provides xmllint which we use to extract a PKCS12 password
@@ -30,7 +33,7 @@
   get_url:
     url: "{{ gateway_openconnect_ca_file }}"
     dest: "{{ openconnect_ca_file }}"
-    force_basic_auth: yes
+    force_basic_auth: true
     url_username: "{{ gateway_test_user }}"
     url_password: "{{ lookup('file', '{{ streisand_gateway_password_localpath }}') }}"
     validate_certs: no
@@ -48,10 +51,10 @@
   get_url:
     url: "{{ gateway_test_url }}/openconnect/{{ profile_name }}.p12"
     dest: "{{ openconnect_profile_dir }}/{{ profile_name }}.p12"
-    force_basic_auth: yes
+    force_basic_auth: true
     url_username: "{{ gateway_test_user }}"
     url_password: "{{ lookup('file', '{{ streisand_gateway_password_localpath }}') }}"
-    validate_certs: no
+    validate_certs: false
   with_items: "{{ test_client_profiles.stdout_lines }}"
   loop_control:
     loop_var: "profile_name"
@@ -63,10 +66,11 @@
   get_url:
     url: "{{ gateway_test_url }}/openconnect/{{ profile_name }}.mobileconfig"
     dest: "{{ openconnect_profile_dir }}/{{ profile_name }}.mobileconfig"
-    force_basic_auth: yes
+    force_basic_auth: true
     url_username: "{{ gateway_test_user }}"
-    url_password: "{{ lookup('file', '{{ streisand_gateway_password_localpath }}') }}"
-    validate_certs: no
+    url_password: >
+      "{{ lookup('file', '{{ streisand_gw_password_path }}') }}"
+    validate_certs: false
   with_items: "{{ test_client_profiles.stdout_lines }}"
   loop_control:
     loop_var: "profile_name"

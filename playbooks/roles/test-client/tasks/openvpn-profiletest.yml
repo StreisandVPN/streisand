@@ -1,7 +1,9 @@
 ---
 - name: "Testing {{ profile_name }} - {{ openvpn_profile_type }}"
   block:
-    - name: "Start OpenVPN with the {{ profile_name }} {{ openvpn_profile_type }} client profile"
+    - name: >
+        "Start OpenVPN with the {{ profile_name }} {{ openvpn_profile_type }}
+        client profile"
       shell: "nohup openvpn {{ openvpn_profile_dir }}/{{ profile_name }}-{{ openvpn_profile_type }}.client-test.ovpn&"
 
     - name: "Read the OpenVPN PID file into a var"
@@ -19,9 +21,9 @@
     - name: "Register the updated /etc/resolv.conf contents"
       shell: "cat /etc/resolv.conf"
       register: openvpn_resolv_conf
-      changed_when: "False"
+      changed_when: "false"
 
-    - name: "Assert that /etc/resolv.conf was updated for the DNSMasq OpenVPN IP"
+    - name: "Assert that /etc/resolv.conf was updated with the OpenVPN IP"
       assert:
         that:
           - "'nameserver {{ dnsmasq_openvpn_tcp_ip }}' in openvpn_resolv_conf.stdout"
@@ -30,7 +32,7 @@
       get_url:
         url: "{{ external_test_url }}"
         dest: "/dev/null"
-        force: "yes"
+        force: "true"
 
     - name: "Stop OpenVPN"
       command: "kill {{ openvpn_pid_output.stdout }}"
@@ -38,7 +40,7 @@
     - name: "Register the updated /etc/resolv.conf contents"
       shell: "cat /etc/resolv.conf"
       register: openvpn_resolv_conf
-      changed_when: "False"
+      changed_when: "false"
 
     - name: "Assert that the DNS was restored to pre-OpenVPN state"
       assert:
@@ -52,4 +54,4 @@
   rescue:
     - name: "Bring down OpenVPN"
       command: "killall openvpn"
-      ignore_errors: "yes"
+      ignore_errors: "true"

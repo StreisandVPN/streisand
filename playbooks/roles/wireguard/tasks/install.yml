@@ -1,21 +1,25 @@
 ---
-
 - name: Determine the running kernel release
   command: uname -r
   register: kernel_release
 
-- name: Add the WireGuard PPA
-  apt_repository:
-    repo: 'ppa:wireguard/wireguard'
-  register: wireguard_add_apt_repository
-  until: not wireguard_add_apt_repository.failed
-  retries: "{{ apt_repository_retries }}"
-  delay: "{{ apt_repository_delay }}"
+# - name: Add the WireGuard PPA
+#   apt_repository:
+#     repo: 'ppa:wireguard/wireguard'
+#   register: wireguard_add_apt_repository
+#   until: not wireguard_add_apt_repository.failed
+#   retries: "{{ apt_repository_retries }}"
+#   delay: "{{ apt_repository_delay }}"
 
 - name: Install the WireGuard packages
   apt:
     package:
       - linux-headers-{{ kernel_release.stdout }}
       - linux-headers-generic
+      - wireguard
       - wireguard-dkms
       - wireguard-tools
+  register: task_result
+  until: task_result is succeeded
+  retries: 15
+  delay: 5

@@ -4,9 +4,9 @@
       sysctl:
         name: "{{ item.key }}"
         value: "{{ item.value }}"
-        ignoreerrors: yes
-        sysctl_set: yes
-        reload: yes
+        ignoreerrors: true
+        sysctl_set: true
+        reload: true
         state: present
       with_items: "{{ sysctl_values }}"
   when: ansible_virtualization_type != 'lxc'
