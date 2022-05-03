@@ -45,7 +45,7 @@ Si vous installez Streisand sur un serveur existant ou un fournisseur alternatif
 {% endif %}
 {% if streisand_wireguard_enabled %}
 * WireGuard
-  * UDP - 53 de/à `{{ dnsmasq_wireguard_ip }}`
+  * UDP - 53 de/à `{{ wireguard_ip }}`
     * Dnsmasq écoute le trafic DNS sur cette IP et répond aux requêtes des clients WireGuard connectés.
   * UDP - {{ wireguard_port }}
 {% endif %}

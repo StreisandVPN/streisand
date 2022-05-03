@@ -53,7 +53,7 @@ Une [configuration expérimentale pour OpenWrt/LEDE](#openwrt) 17.01.4 (ou versi
    `sudo wg-quick down {{ vpn_client_names.results[0].stdout }}`
 
 #### Une note sur la configuration DNS ####
-Chaque fichier inclure la commande `DNS` qui utilise `resolvconf` afin de diriger le trafic DNS vers le serveur dnsmasq qui est disponible via l'interface cryptée WireGuard à `{{ dnsmasq_wireguard_ip }}`. Bien que `resolvconf` soit un utilitaire commun, vous devrez peut-être remplacer cette ligne avec `PostUp`/`PostDown` pour votre distribution ou votre configuration réseau particulière.
+Chaque fichier inclure la commande `DNS` qui utilise `resolvconf` afin de diriger le trafic DNS vers le serveur dnsmasq qui est disponible via l'interface cryptée WireGuard à `{{ wireguard_ip }}`. Bien que `resolvconf` soit un utilitaire commun, vous devrez peut-être remplacer cette ligne avec `PostUp`/`PostDown` pour votre distribution ou votre configuration réseau particulière.
 
 <a name="macos"></a>
 ### macOS ###

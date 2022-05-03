@@ -46,4 +46,4 @@
   with_items: "{{ gpg_verification_results.results }}"
   loop_control:
     label: "{{ item.item.file }}"
-    no_log: true
+  # no_log: true

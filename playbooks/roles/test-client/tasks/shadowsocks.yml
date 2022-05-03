@@ -35,8 +35,7 @@
     dest: "{{ shadowsocks_qr_file }}"
     force_basic_auth: true
     url_username: "{{ gateway_test_user }}"
-    url_password: >
-      "{{ lookup('file', '{{ streisand_gw_password_path }}') }}"
+    url_password: "{{ lookup('file', '{{ streisand_gateway_password_localpath }}') }}"
     validate_certs: false
     mode: 0600
 

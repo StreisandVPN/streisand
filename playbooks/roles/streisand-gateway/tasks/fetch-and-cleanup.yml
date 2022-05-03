@@ -10,7 +10,7 @@
   fetch:
     dest: ../{{ streisand_local_directory }}/
     src: "{{ file.path }}"
-    flat: true
+    flat: false
   with_items: "{{ gateway_local_files.files }}"
   loop_control:
     loop_var: file

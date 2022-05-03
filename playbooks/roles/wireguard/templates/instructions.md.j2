@@ -90,7 +90,7 @@ An [experimental configuration for OpenWrt/LEDE](#openwrt) 17.01.4 (or later) is
    `sudo wg-quick down {{ vpn_client_names.results[0].stdout }}`
 
 #### A note on DNS configuration ####
-Each client configuration profile includes a `DNS` command that uses resolvconf to direct DNS traffic to the dnsmasq server that is available via the WireGuard encrypted interface at `{{ dnsmasq_wireguard_ip }}`. Although resolvconf is a common utility, you may need to use `PostUp`/`PostDown` with a different command for your distribution or particular network configuration.
+Each client configuration profile includes a `DNS` command that uses resolvconf to direct DNS traffic to the dnsmasq server that is available via the WireGuard encrypted interface at `{{ wireguard_ip }}`. Although resolvconf is a common utility, you may need to use `PostUp`/`PostDown` with a different command for your distribution or particular network configuration.
 
 ---
 

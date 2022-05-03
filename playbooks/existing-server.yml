@@ -5,12 +5,12 @@
 
 - name: Register the genesis role in use
   hosts: localhost
-  gather_facts: yes
+  gather_facts: true
   tasks:
     - set_fact:
         streisand_genesis_role: "existing-server"
 
-- include: ssh-setup.yml
+- import_playbook: ssh-setup.yml
 
 - name: Check SSH access to existing server
   hosts: streisand-host
@@ -22,7 +22,7 @@
         - raw: whoami
           args:
             executable: /bin/bash
-          changed_when: False
+          changed_when: false
       rescue:
         - fail:
             msg: "Unable to SSH to existing streisand-host.\nEnsure private key corresponding to \"{{ streisand_ssh_private_key }}\" is loaded in your SSH key agent.\nTry using `ssh-keygen -i {{ streisand_ssh_private_key }} to generate your key if it does not exist\n"
@@ -34,10 +34,9 @@
 - import_playbook: provider-detect.yml
 
 - name: Prepare the remote server for Streisand
-# =========================================
+  # =========================================
   hosts: streisand-host
   remote_user: "{{ lookup('env', 'SSH_USER') }}"
   become: true
 
 - import_playbook: streisand.yml
-...

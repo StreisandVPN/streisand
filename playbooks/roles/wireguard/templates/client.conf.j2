@@ -2,13 +2,13 @@
 [Interface]
 Address = 10.192.122.{{ (item[0].item|int) + 1 }}/32
 # The use of DNS below effectively expands to:
-#   PostUp = echo nameserver {{ dnsmasq_wireguard_ip }} | resolvconf -a tun.%i -m 0 -x
+#   PostUp = echo nameserver {{ wireguard_ip }} | resolvconf -a tun.%i -m 0 -x
 #   PostDown = resolvconf -d tun.%i
 # If the use of resolvconf is not desirable, simply remove the DNS line
 # and use a variant of the PostUp/PostDown lines above.
 # The IP address of the DNS server that is available via the encrypted
-# WireGuard interface is {{ dnsmasq_wireguard_ip }}.
-DNS = {{ dnsmasq_wireguard_ip }}
+# WireGuard interface is {{ wireguard_ip }}.
+DNS = {{ wireguard_ip }}
 PrivateKey = {{ item[1].stdout }}
 
 [Peer]

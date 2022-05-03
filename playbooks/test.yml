@@ -1,0 +1,58 @@
+- name: Register the genesis role in use
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - set_fact:
+        streisand_genesis_role: "existing-server"
+        streisand_le_enabled: false
+        streisand_domain: ""
+        streisand_admin_email: ""
+        le_ok: false
+
+- name: Configure the Server and install required software
+  # ========================================================
+  hosts: streisand-host
+  remote_user: "root"
+  become: true
+  roles:
+    - common
+    - gpg
+    - service-net
+    - role: openconnect
+      when: streisand_openconnect_enabled
+    - role: openvpn
+      when: streisand_openvpn_enabled
+    #  TODO:  Need to troubleshoot shadowsocks role
+    # - role: shadowsocks
+    #   when: streisand_shadowsocks_enabled
+    - role: ssh-forward
+      when: streisand_ssh_forward_enabled
+    - role: tinyproxy
+      when: streisand_tinyproxy_enabled
+    # tor-bridge is skipped in our full Ansible run on Travis CI due to
+    # connectivity issues.
+    - role: tor-bridge
+      when: not streisand_ci and streisand_tor_enabled
+    - sslh
+    - ufw
+    - role: wireguard
+      when: streisand_wireguard_enabled
+    - role: cloudflared
+      when: not streisand_ci and streisand_cloudflared_enabled
+    # streisand_le_enabled is set in lets-encrypt.yml based on user input.
+    # lets-encrypt roles sets le_ok, which is used by streisand-gateway.
+    - role: lets-encrypt
+      when: streisand_le_enabled
+    - role: ad-blocking
+      when: streisand_ad_blocking_enabled
+    - streisand-mirror
+    - streisand-gateway
+
+  # tasks:
+  #   - name: Get path to tinyproxy binary
+  #     shell: which tinyproxy
+  #     register: task_result
+
+  #   - name: debug
+  #     debug:
+  #       var: task_result

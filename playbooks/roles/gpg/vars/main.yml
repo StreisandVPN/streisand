@@ -26,8 +26,7 @@ streisand_gpg_keyserver_address: "hkps://keys.openpgp.org"
 # The default timeout is 30s, we use something larger
 streisand_gpg_timeout: "120"
 # Specify some options when searching for keys in the keyserver
-streisand_default_key_import_flags: >
-  "--keyserver-options timeout={{ streisand_gpg_timeout }}"
+streisand_default_key_import_flags: "--keyserver-options timeout={{ streisand_gpg_timeout }}"
 
 # Which keys from files/ do we add to the keyring in first setup? These keys
 # are trusted ultimately to verify software signatures during Streisand
