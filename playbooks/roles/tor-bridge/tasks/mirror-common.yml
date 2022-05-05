@@ -14,7 +14,7 @@
   # formats though.
   #
   # https://trac.torproject.org/projects/tor/ticket/8940#comment:28
-  shell: curl -s 'https://www.torproject.org/projects/torbrowser/RecommendedTBBVersions/' | python -c 'import json; import re; import sys; j = json.load(sys.stdin); print [re.sub(r"-.*$", "", tbb) for tbb in j if "a" not in tbb and "b" not in tbb][-1];'
+  shell: curl -s 'https://aus1.torproject.org/torbrowser/update_3/release/downloads.json' | python -c 'import json; import re; import sys; j = json.load(sys.stdin); print j["version"];'
   args:
     warn: false
   register: tor_latest_recommended_check
