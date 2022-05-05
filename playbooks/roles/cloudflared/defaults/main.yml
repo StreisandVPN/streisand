@@ -1,12 +1,12 @@
 ---
-cloudflared_base_url: "https://bin.equinox.io/c/VdrWdbjqyF/"
+cloudflared_base_url: "https://github.com/cloudflare/cloudflared/releases/latest/download/"
 
-cloudflared_amd64_apt: "cloudflared-stable-linux-amd64.deb"
-cloudflared_amd64_yum: "cloudflared-stable-linux-amd64.rpm"
-cloudflared_amd64_binary: "cloudflared-stable-linux-amd64.tgz"
-cloudflared_arm_apt: "cloudflared-stable-linux-arm.deb"
-cloudflared_arm_yum: "cloudflared-stable-linux-arm.rpm"
-cloudflared_arm_binary: "cloudflared-stable-linux-arm.tgz"
+cloudflared_amd64_apt: "cloudflared-linux-amd64.deb"
+cloudflared_amd64_yum: "cloudflared-linux-x86_64.rpm"
+cloudflared_amd64_binary: "cloudflared-linux-amd64"
+cloudflared_arm_apt: "cloudflared-linux-arm.deb"
+cloudflared_arm_yum: "cloudflared-linux-arm.rpm"
+cloudflared_arm_binary: "cloudflared-linux-arm"
 
 cloudflared_allow_firewall: false
 cloudflared_enable_service: true
